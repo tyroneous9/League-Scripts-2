@@ -1,0 +1,53 @@
+{
+  "base_url": "https://127.0.0.1:2999/liveclientdata",
+  "endpoints": [
+    {
+      "path": "/allgamedata",
+      "description": "Returns the full state of the game, including players, events, and stats."
+    },
+    {
+      "path": "/activeplayer",
+      "description": "Returns stats and state for the local (active) player."
+    },
+    {
+      "path": "/activeplayerabilities",
+      "description": "Returns ability information for the local player (e.g., cooldowns, levels)."
+    },
+    {
+      "path": "/activeplayername",
+      "description": "Returns the summoner name of the local player."
+    },
+    {
+      "path": "/activeplayerrunes",
+      "description": "Returns the full rune configuration for the local player."
+    },
+    {
+      "path": "/eventdata",
+      "description": "Returns a list of in-game events (kills, towers, objectives, etc.)."
+    },
+    {
+      "path": "/gamestats",
+      "description": "Returns general game info like mode, game time, map, and terrain."
+    },
+    {
+      "path": "/playerlist",
+      "description": "Returns the stats and details of all players in the match."
+    },
+    {
+      "path": "/playerscores?riotId={riotId}",
+      "description": "Returns the KDA, CS, and ward score for a given player."
+    },
+    {
+      "path": "/playersummonerspells?riotId={riotId}",
+      "description": "Returns the summoner spells for a specific player."
+    },
+    {
+      "path": "/playeritems?riotId={riotId}",
+      "description": "Returns the current item list for a specific player."
+    },
+    {
+      "path": "/playermainrunes?riotId={riotId}",
+      "description": "Returns the keystone and rune trees for a specific player."
+    }
+  ]
+}

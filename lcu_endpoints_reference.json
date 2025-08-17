@@ -1,0 +1,52 @@
+{
+  "lol-chat": [
+    "/lol-chat/v1/me",
+    "/lol-chat/v1/friends",
+    "/lol-chat/v1/blocked"  
+  ],
+  "lol-summoner": [
+    "/lol-summoner/v1/current-summoner",
+    "/lol-summoner/v1/summoners/{summonerId}"
+  ],
+  "lol-champ-select": [
+    "/lol-champ-select/v1/session",
+    "/lol-champ-select/v1/current-champion",
+    "/lol-champ-select/v1/pickable-champion-ids",
+    "/lol-champ-select/v1/available-champions",
+    "/lol-champ-select/v1/session/actions/{id}",
+    "/lol-champ-select/v1/session/my-selection"
+  ],
+  "lol-gameflow": [
+    "/lol-gameflow/v1/session",
+    "/lol-gameflow/v1/gameflow-phase"
+  ],
+  "lol-lobby": [
+    "/lol-lobby/v2/lobby",
+    "/lol-lobby/v2/lobby/matchmaking/search",
+    "/lol-lobby/v2/lobby/custom"
+  ],
+  "lol-matchmaking": [
+    "/lol-matchmaking/v1/ready-check",
+    "/lol-matchmaking/v1/search"
+  ],
+  "lol-champions": [
+    "/lol-champions/v1/inventories/{summonerId}/champions-minimal",
+    "/lol-champions/v1/owned-champions"
+  ],
+  "lol-rank": [
+    "/lol-ranked/v1/current-ranked-stats",
+    "/lol-ranked/v1/league-entries"
+  ],
+  "lol-settings": [
+    "/lol-settings/v1/account-settings",
+    "/lol-settings/v1/ready-check-settings"
+  ],
+  "lol-end-of-game": [
+    "/lol-end-of-game/v1/eog-stats-block",
+    "/lol-end-of-game/v1/state"
+  ],
+  "lol-replays": [
+    "/lol-replays/v1/rofls",
+    "/lol-replays/v1/metadata/{gameId}"
+  ]
+}
