@@ -1,0 +1,28 @@
+{
+    "Keybinds": {
+        "center_camera": "space",
+        "hold_to_level": "shift",
+        "item_1": "1",
+        "item_2": "2",
+        "item_3": "3",
+        "item_4": "5",
+        "item_5": "6",
+        "item_6": "7",
+        "recall": "b",
+        "select_ally_1": "f1",
+        "select_ally_2": "f2",
+        "select_ally_3": "f3",
+        "select_ally_4": "f4",
+        "shop": "p",
+        "spell_1": "q",
+        "spell_2": "w",
+        "spell_3": "e",
+        "spell_4": "r",
+        "sum_1": "d",
+        "sum_2": "f"
+    },
+    "General": {
+        "selected_game_mode": "Arena",
+        "champion_name": ""
+    }
+}

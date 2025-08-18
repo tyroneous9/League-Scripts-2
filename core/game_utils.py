@@ -6,12 +6,11 @@ import cv2
 import logging
 from constants import DEFAULT_API_TIMEOUT, LIVE_CLIENT_URL
 import random
-from config_utils import disable_insecure_request_warning, load_settings
-from general_utils import click_percent_relative, find_text_location, get_screenshot
-import threading
-from general_utils import listen_for_exit_key
+from utils.config_utils import disable_insecure_request_warning, load_settings
+from utils.general_utils import click_percent_relative, find_text_location, get_screenshot
 from constants import SCREEN_CENTER
-from logging_config import setup_logging
+from utils.logging_utils import setup_logging
+from utils.ipc_utils import send_resume_signal
 
 
 # ===========================
@@ -34,7 +33,6 @@ def initialize_game_script():
     """
     setup_logging()
     disable_insecure_request_warning()
-    threading.Thread(target=listen_for_exit_key, daemon=True).start()
     logging.info("Game utilities initialized.")
 
 
@@ -42,7 +40,7 @@ def initialize_game_script():
 # API Data Retrieval
 # ===========================
 
-# Retrieve all game data from the live client API
+
 def retrieve_game_data():
     """
     Retrieves all game data from the League client API.
@@ -60,7 +58,7 @@ def retrieve_game_data():
         print(f"[ERROR] Game data request failed: {e}")
         return None
 
-# Poll game data at a regular interval and update the provided container
+
 def poll_game_data(latest_game_data_container, poll_time=5):
     """
     Continuously polls game data and updates the provided container.
@@ -212,3 +210,4 @@ def move_random_offset(x, y, max_offset=15):
     offset_x = random.randint(-max_offset, max_offset)  # percent offset
     offset_y = random.randint(-max_offset, max_offset)  # percent offset
     click_percent_relative(x, y, offset_x, offset_y, "right")
+

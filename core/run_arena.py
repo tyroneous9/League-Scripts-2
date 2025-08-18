@@ -6,11 +6,11 @@ import time
 import threading
 import keyboard
 import logging
-from constants import (
+from core.constants import (
     HEALTH_TICK_COLOR, ENEMY_HEALTH_BAR_COLOR, SCREEN_CENTER
 )
-from general_utils import click_percent_relative
-from game_utils import (
+from utils.general_utils import click_percent_relative
+from utils.game_utils import (
     load_game_settings,
     move_random_offset,
     move_to_ally,
@@ -19,7 +19,7 @@ from game_utils import (
     initialize_game_script,
     buy_recommended_items,
     level_up_abilities,
-    sleep_random
+    sleep_random,
 )
 
 # ===========================
@@ -29,6 +29,7 @@ from game_utils import (
 initialize_game_script()
 _keybinds, _general = load_game_settings()
 _latest_game_data = {'data': None}
+
 
 # ===========================
 # Arena Phase Functions
@@ -93,11 +94,12 @@ def run_arena_bot():
     - Waits for GameStart event before starting main loop
     - Runs shop phase when the active player's level increases (phase change)
     - Otherwise runs combat phase
+    - Exits when monitor_game_end detects game end
     """
+    # API Threads
     polling_thread = threading.Thread(target=poll_game_data, args=(_latest_game_data,), daemon=True)
     polling_thread.start()
 
-    # Wait for GameStart event before starting main loop
     logging.info("Waiting for GameStart event...")
     while True:
         game_data = _latest_game_data.get('data')
@@ -107,25 +109,25 @@ def run_arena_bot():
                 logging.info("GameStart detected. Starting main loop.")
                 break
 
-    # Main Loop
     prev_level = 0
     while True:
         game_data = _latest_game_data.get('data')
         current_level = game_data["activePlayer"].get("level") if game_data else None
 
-        # Run shop phase if level has increased and both are regular
         if current_level is not None and current_level > prev_level:
             time.sleep(3)
             for _ in range(current_level - prev_level):
                 shop_phase()
 
-        # Update the level tracker according to successful API data
         prev_level = current_level if current_level is not None else prev_level
 
         combat_phase()
 
 
 # ===========================
+# Main Entry Point
+# ===========================
+
 if __name__ == "__main__":
     logging.info("Arena bot started.")
     run_arena_bot()

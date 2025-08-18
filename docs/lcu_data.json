@@ -5,7 +5,7 @@
     "gameName": "Tyroneous",
     "internalName": "",
     "nameChangeFlag": false,
-    "percentCompleteForNextLevel": 52,
+    "percentCompleteForNextLevel": 67,
     "privacy": "PUBLIC",
     "profileIconId": 6267,
     "puuid": "f7e519ad-b73e-5e7e-9aa8-18dc716f7264",
@@ -20,7 +20,7 @@
     "summonerLevel": 736,
     "tagLine": "GEORG",
     "unnamed": false,
-    "xpSinceLastLevel": 1709,
+    "xpSinceLastLevel": 2190,
     "xpUntilNextLevel": 3264
   },
   "/lol-champions/v1/inventories/41749132/champions-minimal": [
@@ -132,7 +132,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/3.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 3,
       "isVisibleInClient": true,
       "name": "Galio",
@@ -640,7 +640,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/18.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 18,
       "isVisibleInClient": true,
       "name": "Tristana",
@@ -945,7 +945,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/27.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 27,
       "isVisibleInClient": true,
       "name": "Singed",
@@ -1047,7 +1047,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/30.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 30,
       "isVisibleInClient": true,
       "name": "Karthus",
@@ -1181,7 +1181,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/34.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 34,
       "isVisibleInClient": true,
       "name": "Anivia",
@@ -1349,7 +1349,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/39.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 39,
       "isVisibleInClient": true,
       "name": "Irelia",
@@ -1383,7 +1383,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/40.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 40,
       "isVisibleInClient": true,
       "name": "Janna",
@@ -1450,7 +1450,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/42.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 42,
       "isVisibleInClient": true,
       "name": "Corki",
@@ -1484,7 +1484,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/43.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 43,
       "isVisibleInClient": true,
       "name": "Karma",
@@ -1619,7 +1619,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/50.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 50,
       "isVisibleInClient": true,
       "name": "Swain",
@@ -1754,7 +1754,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/55.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 55,
       "isVisibleInClient": true,
       "name": "Katarina",
@@ -1788,7 +1788,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/56.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 56,
       "isVisibleInClient": true,
       "name": "Nocturne",
@@ -1856,7 +1856,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/58.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 58,
       "isVisibleInClient": true,
       "name": "Renekton",
@@ -1924,7 +1924,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/60.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 60,
       "isVisibleInClient": true,
       "name": "Elise",
@@ -2162,7 +2162,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/69.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 69,
       "isVisibleInClient": true,
       "name": "Cassiopeia",
@@ -2331,7 +2331,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/77.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 77,
       "isVisibleInClient": true,
       "name": "Udyr",
@@ -2467,7 +2467,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/81.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 81,
       "isVisibleInClient": true,
       "name": "Ezreal",
@@ -2703,7 +2703,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/90.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 90,
       "isVisibleInClient": true,
       "name": "Malzahar",
@@ -2736,7 +2736,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/91.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 91,
       "isVisibleInClient": true,
       "name": "Talon",
@@ -2837,7 +2837,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/98.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 98,
       "isVisibleInClient": true,
       "name": "Shen",
@@ -2938,7 +2938,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/102.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 102,
       "isVisibleInClient": true,
       "name": "Shyvana",
@@ -3039,7 +3039,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/105.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 105,
       "isVisibleInClient": true,
       "name": "Fizz",
@@ -3073,7 +3073,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/106.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 106,
       "isVisibleInClient": true,
       "name": "Volibear",
@@ -3175,7 +3175,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/111.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 111,
       "isVisibleInClient": true,
       "name": "Nautilus",
@@ -3914,7 +3914,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/154.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 154,
       "isVisibleInClient": true,
       "name": "Zac",
@@ -3948,7 +3948,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/157.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 157,
       "isVisibleInClient": true,
       "name": "Yasuo",
@@ -4050,7 +4050,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/164.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 164,
       "isVisibleInClient": true,
       "name": "Camille",
@@ -4151,7 +4151,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/201.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 201,
       "isVisibleInClient": true,
       "name": "Braum",
@@ -4185,7 +4185,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/202.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 202,
       "isVisibleInClient": true,
       "name": "Jhin",
@@ -4285,7 +4285,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/222.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 222,
       "isVisibleInClient": true,
       "name": "Jinx",
@@ -4420,7 +4420,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/235.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 235,
       "isVisibleInClient": true,
       "name": "Senna",
@@ -4454,7 +4454,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/236.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 236,
       "isVisibleInClient": true,
       "name": "Lucian",
@@ -4655,7 +4655,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/266.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 266,
       "isVisibleInClient": true,
       "name": "Aatrox",
@@ -5227,7 +5227,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/526.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 526,
       "isVisibleInClient": true,
       "name": "Rell",
@@ -5328,7 +5328,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/777.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 777,
       "isVisibleInClient": true,
       "name": "Yone",
@@ -5362,7 +5362,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/799.ogg",
       "disabledQueues": [],
-      "freeToPlay": true,
+      "freeToPlay": false,
       "id": 799,
       "isVisibleInClient": true,
       "name": "Ambessa",
@@ -5564,7 +5564,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/888.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 888,
       "isVisibleInClient": true,
       "name": "Renata Glasc",
@@ -5666,7 +5666,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/897.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 897,
       "isVisibleInClient": true,
       "name": "K'Sante",
@@ -5700,7 +5700,7 @@
       "botEnabled": true,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/901.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 901,
       "isVisibleInClient": true,
       "name": "Smolder",
@@ -5802,7 +5802,7 @@
       "botEnabled": false,
       "chooseVoPath": "/lol-game-data/assets/v1/champion-choose-vo/950.ogg",
       "disabledQueues": [],
-      "freeToPlay": false,
+      "freeToPlay": true,
       "id": 950,
       "isVisibleInClient": true,
       "name": "Naafiri",
@@ -5833,7 +5833,7 @@
       [
         {
           "actorCellId": 0,
-          "championId": 67,
+          "championId": 11,
           "completed": true,
           "duration": 0,
           "id": 0,
@@ -5844,7 +5844,7 @@
         },
         {
           "actorCellId": 1,
-          "championId": 53,
+          "championId": 200,
           "completed": true,
           "duration": 0,
           "id": 1,
@@ -5855,7 +5855,7 @@
         },
         {
           "actorCellId": 2,
-          "championId": 14,
+          "championId": -1,
           "completed": true,
           "duration": 0,
           "id": 2,
@@ -5866,7 +5866,7 @@
         },
         {
           "actorCellId": 3,
-          "championId": 412,
+          "championId": 893,
           "completed": true,
           "duration": 0,
           "id": 3,
@@ -5877,7 +5877,7 @@
         },
         {
           "actorCellId": 4,
-          "championId": 80,
+          "championId": 31,
           "completed": true,
           "duration": 0,
           "id": 4,
@@ -5888,7 +5888,7 @@
         },
         {
           "actorCellId": 5,
-          "championId": 420,
+          "championId": 799,
           "completed": true,
           "duration": 0,
           "id": 5,
@@ -5899,7 +5899,7 @@
         },
         {
           "actorCellId": 6,
-          "championId": 83,
+          "championId": 8,
           "completed": true,
           "duration": 0,
           "id": 6,
@@ -5910,7 +5910,7 @@
         },
         {
           "actorCellId": 7,
-          "championId": 800,
+          "championId": 36,
           "completed": true,
           "duration": 0,
           "id": 7,
@@ -5921,7 +5921,7 @@
         },
         {
           "actorCellId": 8,
-          "championId": 19,
+          "championId": 777,
           "completed": true,
           "duration": 0,
           "id": 8,
@@ -5932,7 +5932,7 @@
         },
         {
           "actorCellId": 9,
-          "championId": 36,
+          "championId": 200,
           "completed": true,
           "duration": 0,
           "id": 9,
@@ -5943,7 +5943,7 @@
         },
         {
           "actorCellId": 10,
-          "championId": 40,
+          "championId": 69,
           "completed": true,
           "duration": 0,
           "id": 10,
@@ -5954,7 +5954,7 @@
         },
         {
           "actorCellId": 11,
-          "championId": 1,
+          "championId": -1,
           "completed": true,
           "duration": 0,
           "id": 11,
@@ -5965,7 +5965,7 @@
         },
         {
           "actorCellId": 12,
-          "championId": -1,
+          "championId": 36,
           "completed": true,
           "duration": 0,
           "id": 12,
@@ -5976,7 +5976,7 @@
         },
         {
           "actorCellId": 13,
-          "championId": 83,
+          "championId": 142,
           "completed": true,
           "duration": 0,
           "id": 13,
@@ -5987,7 +5987,7 @@
         },
         {
           "actorCellId": 14,
-          "championId": 412,
+          "championId": 350,
           "completed": true,
           "duration": 0,
           "id": 14,
@@ -5998,7 +5998,7 @@
         },
         {
           "actorCellId": 15,
-          "championId": 233,
+          "championId": 36,
           "completed": true,
           "duration": 0,
           "id": 15,
@@ -6011,7 +6011,7 @@
       [
         {
           "actorCellId": 0,
-          "championId": 0,
+          "championId": 267,
           "completed": true,
           "duration": 0,
           "id": 16,
@@ -6022,7 +6022,7 @@
         },
         {
           "actorCellId": 2,
-          "championId": 0,
+          "championId": 104,
           "completed": true,
           "duration": 0,
           "id": 18,
@@ -6033,18 +6033,18 @@
         },
         {
           "actorCellId": 4,
-          "championId": 0,
-          "completed": false,
+          "championId": 223,
+          "completed": true,
           "duration": 0,
           "id": 20,
           "isAllyAction": true,
-          "isInProgress": true,
+          "isInProgress": false,
           "pickTurn": 0,
           "type": "pick"
         },
         {
           "actorCellId": 6,
-          "championId": 0,
+          "championId": 6,
           "completed": true,
           "duration": 0,
           "id": 22,
@@ -6055,45 +6055,45 @@
         },
         {
           "actorCellId": 8,
-          "championId": 0,
-          "completed": false,
+          "championId": -3,
+          "completed": true,
           "duration": 0,
           "id": 24,
           "isAllyAction": true,
-          "isInProgress": true,
+          "isInProgress": false,
           "pickTurn": 0,
           "type": "pick"
         },
         {
           "actorCellId": 10,
-          "championId": 0,
-          "completed": false,
+          "championId": -3,
+          "completed": true,
           "duration": 0,
           "id": 26,
           "isAllyAction": true,
-          "isInProgress": true,
+          "isInProgress": false,
           "pickTurn": 0,
           "type": "pick"
         },
         {
           "actorCellId": 12,
-          "championId": 0,
-          "completed": false,
+          "championId": 222,
+          "completed": true,
           "duration": 0,
           "id": 28,
           "isAllyAction": true,
-          "isInProgress": true,
+          "isInProgress": false,
           "pickTurn": 0,
           "type": "pick"
         },
         {
           "actorCellId": 14,
-          "championId": 0,
-          "completed": false,
+          "championId": -3,
+          "completed": true,
           "duration": 0,
           "id": 30,
           "isAllyAction": true,
-          "isInProgress": true,
+          "isInProgress": false,
           "pickTurn": 0,
           "type": "pick"
         }
@@ -6102,7 +6102,7 @@
         {
           "actorCellId": 1,
           "championId": 0,
-          "completed": false,
+          "completed": true,
           "duration": 0,
           "id": 17,
           "isAllyAction": true,
@@ -6113,7 +6113,7 @@
         {
           "actorCellId": 3,
           "championId": 0,
-          "completed": false,
+          "completed": true,
           "duration": 0,
           "id": 19,
           "isAllyAction": true,
@@ -6124,7 +6124,7 @@
         {
           "actorCellId": 5,
           "championId": 0,
-          "completed": false,
+          "completed": true,
           "duration": 0,
           "id": 21,
           "isAllyAction": true,
@@ -6135,7 +6135,7 @@
         {
           "actorCellId": 7,
           "championId": 0,
-          "completed": false,
+          "completed": true,
           "duration": 0,
           "id": 23,
           "isAllyAction": true,
@@ -6150,7 +6150,7 @@
           "duration": 0,
           "id": 25,
           "isAllyAction": true,
-          "isInProgress": false,
+          "isInProgress": true,
           "pickTurn": 0,
           "type": "pick"
         },
@@ -6161,25 +6161,25 @@
           "duration": 0,
           "id": 27,
           "isAllyAction": true,
-          "isInProgress": false,
+          "isInProgress": true,
           "pickTurn": 0,
           "type": "pick"
         },
         {
           "actorCellId": 13,
-          "championId": 420,
+          "championId": 0,
           "completed": false,
           "duration": 0,
           "id": 29,
           "isAllyAction": true,
-          "isInProgress": false,
+          "isInProgress": true,
           "pickTurn": 0,
           "type": "pick"
         },
         {
           "actorCellId": 15,
           "championId": 0,
-          "completed": false,
+          "completed": true,
           "duration": 0,
           "id": 31,
           "isAllyAction": true,
@@ -6205,23 +6205,23 @@
     "boostableSkinCount": 0,
     "chatDetails": {
       "mucJwtDto": {
-        "channelClaim": "f7e519ad-b73e-5e7e-9aa8-18dc716f7264",
+        "channelClaim": "7218fad3-c025-5e3c-9a41-1e19e2210c47",
         "domain": "lol-champ-select",
-        "jwt": "eyJraWQiOiIxIiwiYWxnIjoiUlMyNTYifQ.eyJ0Z3QiOiJuYTEiLCJzdWIiOiJmN2U1MTlhZC1iNzNlLTVlN2UtOWFhOC0xOGRjNzE2ZjcyNjQiLCJtZXRhZGF0YSI6eyJnYW1lSWQiOiI1MzQ5NTU5Mjc0IiwicmVnaW9uIjoiTkExIiwibG9iYnlUeXBlIjoicHJlLWdhbWUiLCJwcm9kdWN0IjoibG9sIn0sImlzcyI6ImxvbC10ZWFtYnVpbGRlciIsImNobiI6ImY3ZTUxOWFkLWI3M2UtNWU3ZS05YWE4LTE4ZGM3MTZmNzI2NCIsInR5cCI6ImxvbC1jaGFtcC1zZWxlY3QiLCJleHAiOjE3NTU0ODQ5MjAsImlhdCI6MTc1NTQ4NDMyMCwianRpIjoiMmU0YTU1OTEtNTJhMi00MmMwLWFmNzQtNjM1Yjk3MzMxMzRiIiwiY3JtIjoiZjdlNTE5YWQtYjczZS01ZTdlLTlhYTgtMThkYzcxNmY3MjY0QGxvbC1jaGFtcC1zZWxlY3QucHZwLm5ldCJ9.KAkAZD-o3qJSNe8J3cHs-FUqoZG974DIQeL_XnUlHAYYk6lxL9XsF1QFWju0FZ3fj0iuJdGlOpA835q_RNM0DT-eyo8WYQCvq8IXLX7VZxr-_Ac6wu7D_4vXLJ9C9jKTEy6QzHlpXxgoEnluO_8T70WJwunDkc2CPyesCCC8NBTPe4YdWIHHTaEIiWuk6aDWI8O-SHmkREj6DFmvkHOjk7i1om1sgFFDt-Pj7oRwtxoejlZdHFcoO6sw6PngaKNsF5iS4Iu5_Cr2C7XTLMrLk0KSHCD5mQ-TbREMpQd4RQkxlrpa8HLj4b2DNC04M5cHvASQsKHIs00R0wDc6Tfv2w",
+        "jwt": "eyJraWQiOiIxIiwiYWxnIjoiUlMyNTYifQ.eyJ0Z3QiOiJuYTEiLCJzdWIiOiJmN2U1MTlhZC1iNzNlLTVlN2UtOWFhOC0xOGRjNzE2ZjcyNjQiLCJtZXRhZGF0YSI6eyJnYW1lSWQiOiI1MzQ5OTAwNjk0IiwicmVnaW9uIjoiTkExIiwibG9iYnlUeXBlIjoicHJlLWdhbWUiLCJwcm9kdWN0IjoibG9sIn0sImlzcyI6ImxvbC10ZWFtYnVpbGRlciIsImNobiI6IjcyMThmYWQzLWMwMjUtNWUzYy05YTQxLTFlMTllMjIxMGM0NyIsInR5cCI6ImxvbC1jaGFtcC1zZWxlY3QiLCJleHAiOjE3NTU1MzczNzUsImlhdCI6MTc1NTUzNjc3NSwianRpIjoiOWFhYTg2NGEtYTE0NS00NTU0LThiNGEtMzU4ZWRkMDI5YjU2IiwiY3JtIjoiNzIxOGZhZDMtYzAyNS01ZTNjLTlhNDEtMWUxOWUyMjEwYzQ3QGxvbC1jaGFtcC1zZWxlY3QucHZwLm5ldCJ9.HNM0MpbUuJQTQMysCSQOdG6_ip7cENwzZ49d0vr7XUEswEC0qSJG9G0BzBw7WD4XP1P8DKLXf76jffEuZ98FJaC1q_iqqaOkp3WJ7HpALL229W6ChZY7ti8LDNNUqRzPYRWRdr0wgHUzZZmluAJUqWc7jsrEljJD3HKyBzzKN5BIGivJ7_HS1YG0iIJKRZKBIauKzw0Egb8KeAFjGVxF7qlCfbYFBFr4LNZtVTFr3h_i_LefmL405OgDVHFUtx4qOltb1FY8Svx_C2qlT6fA5xzabwQpP0NgzhDvxm58gvA1pON-mTXXaKPXQ44O9ucxmWSWlotgNNsWbmchURFJzw",
         "targetRegion": "na1"
       },
-      "multiUserChatId": "f7e519ad-b73e-5e7e-9aa8-18dc716f7264",
-      "multiUserChatPassword": "eyJraWQiOiIxIiwiYWxnIjoiUlMyNTYifQ.eyJ0Z3QiOiJuYTEiLCJzdWIiOiJmN2U1MTlhZC1iNzNlLTVlN2UtOWFhOC0xOGRjNzE2ZjcyNjQiLCJtZXRhZGF0YSI6eyJnYW1lSWQiOiI1MzQ5NTU5Mjc0IiwicmVnaW9uIjoiTkExIiwibG9iYnlUeXBlIjoicHJlLWdhbWUiLCJwcm9kdWN0IjoibG9sIn0sImlzcyI6ImxvbC10ZWFtYnVpbGRlciIsImNobiI6ImY3ZTUxOWFkLWI3M2UtNWU3ZS05YWE4LTE4ZGM3MTZmNzI2NCIsInR5cCI6ImxvbC1jaGFtcC1zZWxlY3QiLCJleHAiOjE3NTU0ODQ5MjAsImlhdCI6MTc1NTQ4NDMyMCwianRpIjoiMmU0YTU1OTEtNTJhMi00MmMwLWFmNzQtNjM1Yjk3MzMxMzRiIiwiY3JtIjoiZjdlNTE5YWQtYjczZS01ZTdlLTlhYTgtMThkYzcxNmY3MjY0QGxvbC1jaGFtcC1zZWxlY3QucHZwLm5ldCJ9.KAkAZD-o3qJSNe8J3cHs-FUqoZG974DIQeL_XnUlHAYYk6lxL9XsF1QFWju0FZ3fj0iuJdGlOpA835q_RNM0DT-eyo8WYQCvq8IXLX7VZxr-_Ac6wu7D_4vXLJ9C9jKTEy6QzHlpXxgoEnluO_8T70WJwunDkc2CPyesCCC8NBTPe4YdWIHHTaEIiWuk6aDWI8O-SHmkREj6DFmvkHOjk7i1om1sgFFDt-Pj7oRwtxoejlZdHFcoO6sw6PngaKNsF5iS4Iu5_Cr2C7XTLMrLk0KSHCD5mQ-TbREMpQd4RQkxlrpa8HLj4b2DNC04M5cHvASQsKHIs00R0wDc6Tfv2w"
+      "multiUserChatId": "7218fad3-c025-5e3c-9a41-1e19e2210c47",
+      "multiUserChatPassword": "eyJraWQiOiIxIiwiYWxnIjoiUlMyNTYifQ.eyJ0Z3QiOiJuYTEiLCJzdWIiOiJmN2U1MTlhZC1iNzNlLTVlN2UtOWFhOC0xOGRjNzE2ZjcyNjQiLCJtZXRhZGF0YSI6eyJnYW1lSWQiOiI1MzQ5OTAwNjk0IiwicmVnaW9uIjoiTkExIiwibG9iYnlUeXBlIjoicHJlLWdhbWUiLCJwcm9kdWN0IjoibG9sIn0sImlzcyI6ImxvbC10ZWFtYnVpbGRlciIsImNobiI6IjcyMThmYWQzLWMwMjUtNWUzYy05YTQxLTFlMTllMjIxMGM0NyIsInR5cCI6ImxvbC1jaGFtcC1zZWxlY3QiLCJleHAiOjE3NTU1MzczNzUsImlhdCI6MTc1NTUzNjc3NSwianRpIjoiOWFhYTg2NGEtYTE0NS00NTU0LThiNGEtMzU4ZWRkMDI5YjU2IiwiY3JtIjoiNzIxOGZhZDMtYzAyNS01ZTNjLTlhNDEtMWUxOWUyMjEwYzQ3QGxvbC1jaGFtcC1zZWxlY3QucHZwLm5ldCJ9.HNM0MpbUuJQTQMysCSQOdG6_ip7cENwzZ49d0vr7XUEswEC0qSJG9G0BzBw7WD4XP1P8DKLXf76jffEuZ98FJaC1q_iqqaOkp3WJ7HpALL229W6ChZY7ti8LDNNUqRzPYRWRdr0wgHUzZZmluAJUqWc7jsrEljJD3HKyBzzKN5BIGivJ7_HS1YG0iIJKRZKBIauKzw0Egb8KeAFjGVxF7qlCfbYFBFr4LNZtVTFr3h_i_LefmL405OgDVHFUtx4qOltb1FY8Svx_C2qlT6fA5xzabwQpP0NgzhDvxm58gvA1pON-mTXXaKPXQ44O9ucxmWSWlotgNNsWbmchURFJzw"
     },
-    "counter": 57,
-    "gameId": 5349559274,
+    "counter": 83,
+    "gameId": 5349900694,
     "hasSimultaneousBans": true,
     "hasSimultaneousPicks": false,
-    "id": "43506f02-73e0-42df-929d-29a734882351",
+    "id": "139737d6-e6a8-41c4-9c2b-bd752765af07",
     "isCustomGame": false,
     "isLegacyChampSelect": false,
     "isSpectating": false,
-    "localPlayerCellId": 12,
+    "localPlayerCellId": 10,
     "lockedEventIndex": -1,
     "myTeam": [
       {
@@ -6233,7 +6233,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "8171299c-9951-509b-9477-3726a39117e7",
+        "obfuscatedPuuid": "8171e9b9-ed51-509b-9476-f703d79117e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6257,7 +6257,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6281,7 +6281,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6305,7 +6305,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6329,7 +6329,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6353,7 +6353,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6377,7 +6377,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6401,7 +6401,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6425,7 +6425,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6449,7 +6449,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6467,55 +6467,7 @@
       {
         "assignedPosition": "",
         "cellId": 10,
-        "championId": 0,
-        "championPickIntent": 0,
-        "gameName": "",
-        "internalName": "",
-        "isHumanoid": false,
-        "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
-        "obfuscatedSummonerId": 6756323121987,
-        "pickMode": 0,
-        "pickTurn": 0,
-        "playerAlias": "",
-        "playerType": "",
-        "puuid": "",
-        "selectedSkinId": 0,
-        "spell1Id": 0,
-        "spell2Id": 0,
-        "summonerId": 0,
-        "tagLine": "",
-        "team": 1,
-        "wardSkinId": -1
-      },
-      {
-        "assignedPosition": "",
-        "cellId": 11,
-        "championId": 0,
-        "championPickIntent": 0,
-        "gameName": "",
-        "internalName": "",
-        "isHumanoid": false,
-        "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
-        "obfuscatedSummonerId": 6756323121987,
-        "pickMode": 0,
-        "pickTurn": 0,
-        "playerAlias": "",
-        "playerType": "",
-        "puuid": "",
-        "selectedSkinId": 0,
-        "spell1Id": 0,
-        "spell2Id": 0,
-        "summonerId": 0,
-        "tagLine": "",
-        "team": 1,
-        "wardSkinId": -1
-      },
-      {
-        "assignedPosition": "",
-        "cellId": 12,
-        "championId": 0,
+        "championId": -3,
         "championPickIntent": 0,
         "gameName": "Tyroneous",
         "internalName": "",
@@ -6538,10 +6490,10 @@
       },
       {
         "assignedPosition": "",
-        "cellId": 13,
+        "cellId": 11,
         "championId": 0,
-        "championPickIntent": 420,
-        "gameName": "akiramayari",
+        "championPickIntent": 0,
+        "gameName": "Harken",
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "VISIBLE",
@@ -6551,12 +6503,60 @@
         "pickTurn": 0,
         "playerAlias": "",
         "playerType": "",
-        "puuid": "76bab034-3daa-55c6-8d14-0a3ab8817a10",
+        "puuid": "7218fad3-c025-5e3c-9a41-1e19e2210c47",
         "selectedSkinId": 0,
         "spell1Id": 2201,
         "spell2Id": 2202,
-        "summonerId": 3473785786066656,
-        "tagLine": "4623",
+        "summonerId": 3676776053082080,
+        "tagLine": "5714",
+        "team": 1,
+        "wardSkinId": -1
+      },
+      {
+        "assignedPosition": "",
+        "cellId": 12,
+        "championId": 0,
+        "championPickIntent": 0,
+        "gameName": "",
+        "internalName": "",
+        "isHumanoid": false,
+        "nameVisibilityType": "HIDDEN",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
+        "obfuscatedSummonerId": 6756323121987,
+        "pickMode": 0,
+        "pickTurn": 0,
+        "playerAlias": "",
+        "playerType": "",
+        "puuid": "",
+        "selectedSkinId": 0,
+        "spell1Id": 0,
+        "spell2Id": 0,
+        "summonerId": 0,
+        "tagLine": "",
+        "team": 1,
+        "wardSkinId": -1
+      },
+      {
+        "assignedPosition": "",
+        "cellId": 13,
+        "championId": 0,
+        "championPickIntent": 0,
+        "gameName": "",
+        "internalName": "",
+        "isHumanoid": false,
+        "nameVisibilityType": "HIDDEN",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
+        "obfuscatedSummonerId": 6756323121987,
+        "pickMode": 0,
+        "pickTurn": 0,
+        "playerAlias": "",
+        "playerType": "",
+        "puuid": "",
+        "selectedSkinId": 0,
+        "spell1Id": 0,
+        "spell2Id": 0,
+        "summonerId": 0,
+        "tagLine": "",
         "team": 1,
         "wardSkinId": -1
       },
@@ -6569,7 +6569,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6593,7 +6593,7 @@
         "internalName": "",
         "isHumanoid": false,
         "nameVisibilityType": "HIDDEN",
-        "obfuscatedPuuid": "807076a9-f451-509b-0581-5345709017e7",
+        "obfuscatedPuuid": "807076a9-f451-509b-6561-47814a9017e7",
         "obfuscatedSummonerId": 6756323121987,
         "pickMode": 0,
         "pickTurn": 0,
@@ -6611,155 +6611,155 @@
     ],
     "pickOrderSwaps": [
       {
+        "cellId": 11,
+        "id": 225,
+        "state": "AVAILABLE"
+      },
+      {
+        "cellId": 12,
+        "id": 226,
+        "state": "AVAILABLE"
+      },
+      {
         "cellId": 15,
-        "id": 150,
-        "state": "AVAILABLE"
-      },
-      {
-        "cellId": 1,
-        "id": 151,
-        "state": "AVAILABLE"
-      },
-      {
-        "cellId": 0,
-        "id": 152,
-        "state": "AVAILABLE"
-      },
-      {
-        "cellId": 9,
-        "id": 153,
-        "state": "AVAILABLE"
-      },
-      {
-        "cellId": 2,
-        "id": 154,
-        "state": "AVAILABLE"
-      },
-      {
-        "cellId": 3,
-        "id": 155,
-        "state": "AVAILABLE"
-      },
-      {
-        "cellId": 10,
-        "id": 156,
-        "state": "AVAILABLE"
-      },
-      {
-        "cellId": 6,
-        "id": 157,
+        "id": 227,
         "state": "AVAILABLE"
       },
       {
         "cellId": 7,
-        "id": 158,
+        "id": 228,
         "state": "AVAILABLE"
       },
       {
-        "cellId": 14,
-        "id": 159,
+        "cellId": 9,
+        "id": 229,
         "state": "AVAILABLE"
       },
       {
-        "cellId": 4,
-        "id": 160,
+        "cellId": 0,
+        "id": 230,
+        "state": "AVAILABLE"
+      },
+      {
+        "cellId": 1,
+        "id": 231,
         "state": "AVAILABLE"
       },
       {
         "cellId": 5,
-        "id": 161,
+        "id": 232,
         "state": "AVAILABLE"
       },
       {
-        "cellId": 8,
-        "id": 162,
+        "cellId": 14,
+        "id": 233,
         "state": "AVAILABLE"
       },
       {
-        "cellId": 11,
-        "id": 163,
+        "cellId": 4,
+        "id": 234,
         "state": "AVAILABLE"
       },
       {
         "cellId": 13,
-        "id": 164,
+        "id": 235,
+        "state": "AVAILABLE"
+      },
+      {
+        "cellId": 8,
+        "id": 236,
+        "state": "AVAILABLE"
+      },
+      {
+        "cellId": 3,
+        "id": 237,
+        "state": "AVAILABLE"
+      },
+      {
+        "cellId": 2,
+        "id": 238,
+        "state": "AVAILABLE"
+      },
+      {
+        "cellId": 6,
+        "id": 239,
         "state": "AVAILABLE"
       }
     ],
     "positionSwaps": [
       {
+        "cellId": 11,
+        "id": 225,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 12,
+        "id": 226,
+        "state": "INVALID"
+      },
+      {
         "cellId": 15,
-        "id": 150,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 1,
-        "id": 151,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 0,
-        "id": 152,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 9,
-        "id": 153,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 2,
-        "id": 154,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 3,
-        "id": 155,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 10,
-        "id": 156,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 6,
-        "id": 157,
+        "id": 227,
         "state": "INVALID"
       },
       {
         "cellId": 7,
-        "id": 158,
+        "id": 228,
         "state": "INVALID"
       },
       {
-        "cellId": 14,
-        "id": 159,
+        "cellId": 9,
+        "id": 229,
         "state": "INVALID"
       },
       {
-        "cellId": 4,
-        "id": 160,
+        "cellId": 0,
+        "id": 230,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 1,
+        "id": 231,
         "state": "INVALID"
       },
       {
         "cellId": 5,
-        "id": 161,
+        "id": 232,
         "state": "INVALID"
       },
       {
-        "cellId": 8,
-        "id": 162,
+        "cellId": 14,
+        "id": 233,
         "state": "INVALID"
       },
       {
-        "cellId": 11,
-        "id": 163,
+        "cellId": 4,
+        "id": 234,
         "state": "INVALID"
       },
       {
         "cellId": 13,
-        "id": 164,
+        "id": 235,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 8,
+        "id": 236,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 3,
+        "id": 237,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 2,
+        "id": 238,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 6,
+        "id": 239,
         "state": "INVALID"
       }
     ],
@@ -6769,86 +6769,86 @@
     "skipChampionSelect": false,
     "theirTeam": [],
     "timer": {
-      "adjustedTimeLeftInPhase": 18489,
-      "internalNowInEpochMs": 1755484372785,
+      "adjustedTimeLeftInPhase": 29972,
+      "internalNowInEpochMs": 1755536840227,
       "isInfinite": false,
       "phase": "BAN_PICK",
       "totalTimeInPhase": 35000
     },
     "trades": [
       {
-        "cellId": 15,
-        "id": 150,
-        "state": "INVALID"
-      },
-      {
         "cellId": 1,
-        "id": 151,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 9,
-        "id": 153,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 3,
-        "id": 155,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 10,
-        "id": 156,
+        "id": 539,
         "state": "INVALID"
       },
       {
         "cellId": 7,
-        "id": 158,
+        "id": 569,
         "state": "INVALID"
       },
       {
-        "cellId": 14,
-        "id": 159,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 4,
-        "id": 160,
+        "cellId": 15,
+        "id": 599,
         "state": "INVALID"
       },
       {
         "cellId": 5,
-        "id": 161,
-        "state": "INVALID"
-      },
-      {
-        "cellId": 8,
-        "id": 162,
+        "id": 629,
         "state": "INVALID"
       },
       {
         "cellId": 11,
-        "id": 163,
+        "id": 390,
         "state": "INVALID"
       },
       {
-        "cellId": 13,
-        "id": 164,
+        "cellId": 12,
+        "id": 392,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 9,
+        "id": 398,
         "state": "INVALID"
       },
       {
         "cellId": 0,
-        "id": 259,
+        "id": 400,
         "state": "INVALID"
       },
       {
-        "cellId": 6,
-        "id": 289,
+        "cellId": 14,
+        "id": 406,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 13,
+        "id": 410,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 8,
+        "id": 412,
         "state": "INVALID"
       },
       {
         "cellId": 2,
-        "id": 319,
+        "id": 416,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 4,
+        "id": 449,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 6,
+        "id": 479,
+        "state": "INVALID"
+      },
+      {
+        "cellId": 3,
+        "id": 509,
         "state": "INVALID"
       }
     ]

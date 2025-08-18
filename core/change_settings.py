@@ -1,7 +1,5 @@
-from config_utils import load_config, load_default_config, save_config
+from utils.config_utils import load_config, load_default_config, save_config
 import tkinter as tk
-from tkinter import messagebox
-import threading
 import keyboard  # Requires local install
 
 def launch_keybind_gui():
@@ -91,6 +89,3 @@ def launch_keybind_gui():
     root.geometry(f"{width}x{height}")
 
     root.mainloop()
-
-if __name__ == "__main__":
-    launch_keybind_gui()

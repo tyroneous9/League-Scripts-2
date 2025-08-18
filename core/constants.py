@@ -11,10 +11,12 @@ import win32api
 # Riot's LiveClientData API URL
 LIVE_CLIENT_URL = "https://127.0.0.1:2999/liveclientdata"
 
-# Riot LCU WebSocket endpoints
+# Riot LCU REST and WebSocket endpoints
 LCU_MATCHMAKING_READY_CHECK = "/lol-matchmaking/v1/ready-check"
 LCU_CHAMP_SELECT_SESSION = "/lol-champ-select/v1/session"
 LCU_GAMEFLOW_PHASE = "/lol-gameflow/v1/gameflow-phase"
+LCU_SUMMONER = "/lol-summoner/v1/current-summoner"
+LCU_CHAMPIONS_MINIMAL = "/lol-champions/v1/inventories/{summoner_id}/champions-minimal"
 
 # ===========================
 # Timeouts and Delays
@@ -30,11 +32,11 @@ KEY_PRESS_DELAY = 0.05
 # Supported Game Modes
 # ===========================
 
-# Maps mode names to their runner scripts
+# Maps mode names to their runner scripts (now just names for direct calls)
 SUPPORTED_MODES = {
-    "arena": ["python", "core/run_arena.py"],
-    # "aram": ["python", "core/run_aram.py"],
-    # "swiftplay": ["python", "core/run_swiftplay.py"],
+    "arena": "run_arena",
+    # "aram": "run_aram",
+    # "swiftplay": "run_swiftplay",
 }
 
 # ===========================
@@ -55,13 +57,6 @@ ALLY_HEALTH_BAR_COLOR = (242, 189, 110)  # Blue
 screen_width = win32api.GetSystemMetrics(0)
 screen_height = win32api.GetSystemMetrics(1)
 SCREEN_CENTER = (screen_width // 2, screen_height // 2)
-
-# ===========================
-# Logging
-# ===========================
-
-# Log file name for main logging output
-LOG_FILE_NAME = "main_log.log"
 
 # ===========================
 # OCR Configuration
