@@ -1,18 +1,35 @@
+# ==========================================================
+# League Client Automation Script
+# ==========================================================
+
+import logging
 import time
 import threading
 import random
 import subprocess
-import keyboard
-import os
 import requests
 from lcu_driver import Connector
 from config_utils import load_config, disable_insecure_request_warning
-from constants import LCU_CHAMP_SELECT_SESSION, LCU_MATCHMAKING_READY_CHECK, LCU_GAMEFLOW_PHASE, LIVE_CLIENT_URL, DEFAULT_API_TIMEOUT, SUPPORTED_MODES
-from utils import get_league_window, click_percent, listen_for_exit_key
+from constants import (
+    LCU_CHAMP_SELECT_SESSION, LCU_MATCHMAKING_READY_CHECK, LCU_GAMEFLOW_PHASE,
+    LIVE_CLIENT_URL, DEFAULT_API_TIMEOUT, SUPPORTED_MODES,
+    LEAGUE_CLIENT_WINDOW_TITLE
+)
+from general_utils import click_percent_absolute
+import win32gui
+import win32con
+from logging_config import setup_logging
+
+# Setup logging
+setup_logging()
+
+# ===========================
+# Initialization
+# ===========================
 
 disable_insecure_request_warning()
 
-# Data
+# State variables
 should_click = True
 in_champ_select = False
 in_ready_check = False
@@ -24,48 +41,88 @@ picked_champion = False
 game_started = False
 check_game_thread_running = False
 
-# Threads
+# ===========================
+# Threaded Actions
+# ===========================
+
+def bring_client_to_front():
+    """
+    Brings the League Client window to the foreground.
+    """
+    hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
+    if hwnd:
+        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        win32gui.SetForegroundWindow(hwnd)
+        time.sleep(0.2)
+    else:
+        logging.warning(f"{LEAGUE_CLIENT_WINDOW_TITLE} window not found.")
+
 def start_queue_loop():
+    """
+    Periodically brings the client to the front and clicks the queue button.
+    """
     while True:
-        hwnd = get_league_window()
-        click_percent(hwnd, 40, 95)
+        bring_client_to_front()
+        click_percent_absolute(40, 95)
         time.sleep(5)
 
 def check_game_start():
+    """
+    Polls for game start, brings client to front, and launches the appropriate bot script.
+    """
     global check_game_thread_running
     if check_game_thread_running:
         return
     check_game_thread_running = True
-    print("[INFO] Waiting for game to start...")
+    logging.info("Waiting for game to start...")
     while True:
         try:
             res = requests.get(f"{LIVE_CLIENT_URL}/allgamedata", timeout=DEFAULT_API_TIMEOUT, verify=False)
             if res.status_code == 200:
-                print("[INFO] Game detected. Launching bot...")
+                bring_client_to_front()
+                logging.info("Game detected. Launching bot...")
                 try:
                     config = load_config()
-                    mode = config.get("General", {}).get("mode", "").lower()
+                    mode = config.get("General", {}).get("selected_game_mode", "").lower()
                     if mode in SUPPORTED_MODES:
                         subprocess.run(SUPPORTED_MODES[mode])
                     else:
-                        print(f"[ABORTED] Game detected but mode '{mode}' is not supported. No bot launched.")
+                        logging.warning(f"Game detected but mode '{mode}' is not supported. No bot launched.")
                 except Exception as e:
-                    print(f"[ERROR] Failed to launch bot: {e}")
+                    logging.error(f"Failed to launch bot: {e}")
                 break
         except:
             pass
         time.sleep(2)
     check_game_thread_running = False
 
-# Event listeners
+# ===========================
+# LCU Event Listeners
+# ===========================
+
 @connector.ready
 async def connect(connection):
+    """
+    Called when the connector is ready.
+    Starts threads and fetches summoner/champion data.
+    """
     global summoner_id, champions_map
-    print("Connected to League Client, starting queue.")
+    logging.info("Connected to League Client, waiting for window...")
 
-    # Start threads
-    threading.Thread(target=listen_for_exit_key, daemon=True).start()
-    threading.Thread(target=check_game_start, daemon=True).start()
+    hwnd = None
+    for _ in range(60):  # Timeout for client window
+        hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
+        if hwnd and win32gui.IsWindow(hwnd):
+            break
+        logging.info("League client window not found, retrying...")
+        time.sleep(1)
+    if not hwnd:
+        logging.error("League client window not available. Aborting automation.")
+        return
+
+    bring_client_to_front()
+
+    # Start queue
     threading.Thread(target=start_queue_loop, daemon=True).start()
 
     # Fetch summoner ID
@@ -83,6 +140,11 @@ async def connect(connection):
 
 @connector.ws.register(LCU_CHAMP_SELECT_SESSION, event_types=('CREATE', 'UPDATE',))
 async def on_champ_select(connection, event):
+    """
+    Handles champion selection during champ select phase.
+    Picks a random owned champion if not already picked.
+    """
+    bring_client_to_front()
     global picked_champion
     global in_champ_select
     in_champ_select = True
@@ -97,12 +159,12 @@ async def on_champ_select(connection, event):
                 if action.get('actorCellId') == local_cell_id and action.get('type') == 'pick' and action.get('isInProgress'):
                     action_id = action.get('id')
                     if not champions_map:
-                        print("[ERROR] No champions found in champion map. Skipping pick.")
+                        logging.error("No champions found in champion map. Skipping pick.")
                         return
 
                     valid_champ_ids = [cid for cid in champions_map.values() if cid != -1]
                     if not valid_champ_ids:
-                        print("[ERROR] No valid champion IDs available.")
+                        logging.error("No valid champion IDs available.")
                         return
                     champ_id = random.choice(valid_champ_ids)
                     
@@ -114,24 +176,31 @@ async def on_champ_select(connection, event):
                         data={"championId": champ_id, "completed": True}
                     )
                     picked_champion = True
-                    print(f"[INFO] Champion picked: {champ_name} (ID: {champ_id})")
+                    logging.info(f"Champion picked: {champ_name} (ID: {champ_id})")
                     return
     elif phase not in ('BAN_PICK'):
         picked_champion = False  # Reset flag when not in pick phase
 
 @connector.ws.register(LCU_MATCHMAKING_READY_CHECK, event_types=('UPDATE',))
 async def on_ready_check(connection, event):
+    """
+    Handles ready check popups and auto-accepts if needed.
+    """
+    bring_client_to_front()
     global in_ready_check
     if event.data.get('state') == 'InProgress' and event.data.get('playerResponse') == 'None':
         if not in_ready_check:
             await connection.request('post', '/lol-matchmaking/v1/ready-check/accept')
-            print("[INFO] Accepted ready check.")
+            logging.info("Accepted ready check.")
             in_ready_check = True
     elif event.data.get('state') != 'InProgress':
         in_ready_check = False  # Reset flag when not in ready check
 
 @connector.ws.register(LCU_GAMEFLOW_PHASE, event_types=('UPDATE',))
 async def on_game_launch(connection, event):
+    """
+    Detects when the game launches and starts the bot.
+    """
     global game_started
     if event.data == "InProgress":
         if not game_started:
@@ -142,8 +211,28 @@ async def on_game_launch(connection, event):
 
 @connector.close
 async def disconnect(_):
-    print("League Client has been closed.")
+    """
+    Called when the League Client closes.
+    """
+    logging.info("League Client has been closed.")
 
-# Start the connector
+# ===========================
+# Main Entry Point
+# ===========================
+
 if __name__ == "__main__":
+    # Immediately check if the game has already started
+    try:
+        res = requests.get(f"{LIVE_CLIENT_URL}/allgamedata", timeout=DEFAULT_API_TIMEOUT, verify=False)
+        if res.status_code == 200:
+            logging.info("Game already in progress. Launching bot immediately...")
+            config = load_config()
+            mode = config.get("General", {}).get("selected_game_mode", "").lower()
+            if mode in SUPPORTED_MODES:
+                subprocess.run(SUPPORTED_MODES[mode])
+            else:
+                logging.warning(f"Game detected but mode '{mode}' is not supported. No bot launched.")
+    except Exception as e:
+        logging.error(f"Immediate game check failed: {e}")
+
     connector.start()

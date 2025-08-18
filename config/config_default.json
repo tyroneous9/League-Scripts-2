@@ -22,7 +22,7 @@
         "sum_2": "f"
     },
     "General": {
-        "mode": "Arena",
+        "selected_game_mode": "Arena",
         "champion_name": ""
     }
 }
