@@ -7,8 +7,7 @@ import logging
 from core.constants import DEFAULT_API_TIMEOUT, LIVE_CLIENT_URL, SCREEN_CENTER
 import random
 from utils.config_utils import disable_insecure_request_warning, load_settings
-from utils.general_utils import click_percent_relative, find_text_location, get_screenshot
-from utils.logging_utils import setup_logging
+from utils.general_utils import click_percent_relative, find_text_location, get_screenshot, enable_logging
 
 
 # ===========================
@@ -29,74 +28,9 @@ def initialize_game_script():
     """
     Performs all game-related initialization
     """
-    setup_logging()
+    enable_logging()
     disable_insecure_request_warning()
     logging.info("Game utilities initialized.")
-
-
-# ===========================
-# API Data Retrieval
-# ===========================
-
-
-def retrieve_game_data():
-    """
-    Retrieves all game data from the League client API.
-    Returns:
-        dict or None: Game data if successful, else None.
-    """
-    try:
-        res = requests.get(f"{LIVE_CLIENT_URL}/allgamedata", timeout=DEFAULT_API_TIMEOUT, verify=False)
-        if res.status_code == 200:
-            return res.json()
-        else:
-            print("[ERROR] Game data request failed.")
-            return None
-    except Exception as e:
-        print(f"[ERROR] Game data request failed: {e}")
-        return None
-
-
-def poll_game_data(latest_game_data_container, poll_time=2):
-    """
-    Continuously polls game data and updates the provided container.
-    Args:
-        latest_game_data_container (dict): Container to store latest data.
-        poll_time (int): Poll interval in seconds.
-    """
-    while True:
-        latest_game_data_container['data'] = retrieve_game_data()
-        time.sleep(poll_time)
-
-
-def retrieve_gameflow_phase():
-    """
-    Retrieves the current gameflow-phase from the League client API.
-    Returns:
-        str: The current gameflow-phase if successful, else "None".
-    """
-    try:
-        res = requests.get(f"{LIVE_CLIENT_URL}/gameflow-phase", timeout=DEFAULT_API_TIMEOUT, verify=False)
-        if res.status_code == 200:
-            return res.json()
-        else:
-            print("[ERROR] Gameflow-phase request failed.")
-            return "None"
-    except Exception as e:
-        print(f"[ERROR] Gameflow-phase request failed: {e}")
-        return "None"
-
-
-def poll_gameflow_phase(latest_phase_container, poll_time=2):
-    """
-    Continuously polls the gameflow-phase endpoint and updates the provided container.
-    Args:
-        latest_phase_container (dict): Container to store latest phase.
-        poll_time (int): Poll interval in seconds.
-    """
-    while True:
-        latest_phase_container['phase'] = retrieve_gameflow_phase()
-        time.sleep(poll_time)
 
 
 # ===========================

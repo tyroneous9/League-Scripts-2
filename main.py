@@ -5,15 +5,12 @@ import tkinter as tk
 from tkinter import ttk
 from utils.config_utils import load_config, save_config, disable_insecure_request_warning
 from core.constants import SUPPORTED_MODES, LCU_GAMEFLOW_PHASE, LCU_CHAMP_SELECT_SESSION, LCU_MATCHMAKING_READY_CHECK, LEAGUE_CLIENT_WINDOW_TITLE
-from utils.general_utils import listen_for_exit_key, click_percent_absolute
-from utils.logging_utils import setup_logging
+from utils.general_utils import bring_window_to_front, is_duplicate_event, listen_for_exit_key, start_queue_loop, listen_for_exit_key, is_duplicate_event, start_queue_loop, enable_logging
 from core.change_settings import launch_keybind_gui
 from core.run_arena import run_arena_bot
 from lcu_driver import Connector
 import win32gui
-import win32con
-from pynput import keyboard
-import sys
+import logging
 
 processes = []
 connector = Connector()
@@ -27,27 +24,8 @@ champions_map = {}
 summoner_id = None
 picked_champion = False
 game_started = False
+last_event = {}
 
-def bring_client_to_front():
-    """
-    Brings the League Client window to the foreground.
-    """
-    hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
-    if hwnd:
-        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-        win32gui.SetForegroundWindow(hwnd)
-        time.sleep(0.2)
-    else:
-        print(f"[WARNING] {LEAGUE_CLIENT_WINDOW_TITLE} window not found.")
-
-def start_queue_loop():
-    """
-    Periodically brings the client to the front and clicks the queue button.
-    """
-    while True:
-        bring_client_to_front()
-        click_percent_absolute(40, 95)
-        time.sleep(5)
 
 def show_menu():
     config = load_config()
@@ -60,8 +38,7 @@ def show_menu():
     return input("Select an option: ").strip()
 
 def run_script():
-    print("\n[INFO] Starting Script. Waiting for client...\n")
-    disable_insecure_request_warning()
+    logging.info("Starting Script. Waiting for client...")
     connector.start()
 
 def change_settings():
@@ -74,7 +51,7 @@ def set_game_mode():
         config["General"]["selected_game_mode"] = selected
         save_config(config)
         root.destroy()
-        print(f"Game mode set to '{selected}'.")
+        logging.info(f"Game mode set to '{selected}'.")
 
     config = load_config()
     selected_game_mode = config.get("General", {}).get("selected_game_mode", list(SUPPORTED_MODES.keys())[0])
@@ -103,21 +80,22 @@ async def connect(connection):
     Event: League Client found.
     Purpose: Fetch summoner data and start queue loop.
     """
+    if is_duplicate_event('connect', None, last_event):
+        return
     global summoner_id, champions_map
-    print("[INFO] Connected to League Client, waiting for window...")
+    logging.info("Connected to League Client, waiting for window to load...")
 
     hwnd = None
     for _ in range(60):  # Timeout for client window
         hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
         if hwnd and win32gui.IsWindow(hwnd):
+            bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
             break
-        print("[INFO] League client window not found, retrying...")
+        logging.info("League client window not found, retrying...")
         time.sleep(1)
     if not hwnd:
-        print("[ERROR] League client window not available. Aborting script.")
+        logging.error("League client window not available. Aborting script.")
         return
-
-    bring_client_to_front()
 
     # Start queue
     threading.Thread(target=start_queue_loop, daemon=True).start()
@@ -141,6 +119,8 @@ async def on_champ_select(connection, event):
     Event: Champion Select session created or updated.
     Purpose: Attempt to pick Bravery, then a random champion.
     """
+    if is_duplicate_event('champ_select', event.data, last_event):
+        return
     global picked_champion, champions_map, summoner_id
     timer = event.data.get('timer', {})
     phase = timer.get('phase')
@@ -155,7 +135,7 @@ async def on_champ_select(connection, event):
                     action_id = action.get('id')
 
                     # Attempt to pick championId -3 (Bravery)
-                    print("[INFO] Attempting to pick championId -3 (Bravery)...")
+                    logging.info("Attempting to pick championId -3 (Bravery)...")
                     await connection.request(
                         'patch',
                         f'/lol-champ-select/v1/session/actions/{action_id}',
@@ -171,18 +151,18 @@ async def on_champ_select(connection, event):
                             picked_bravery = True
                             break
                     if picked_bravery:
-                        print("[INFO] Successfully picked Bravery.")
+                        logging.info("Successfully picked Bravery.")
                         return
 
                     # Fallback to picking a random champion from your pool...
-                    print("[INFO] Attempting to pick a random champion from your pool...")
+                    logging.info("Attempting to pick a random champion from your pool...")
                     if not champions_map:
-                        print("[ERROR] No champions found in champion map. Skipping pick.")
+                        logging.error("No champions found in champion map. Skipping pick.")
                         return
 
                     valid_champ_ids = [cid for cid in champions_map.values() if cid != -1]
                     if not valid_champ_ids:
-                        print("[ERROR] No valid champion IDs available.")
+                        logging.error("No valid champion IDs available.")
                         return
                     champ_id = random.choice(valid_champ_ids)
                     champ_name = next((name for name, cid in champions_map.items() if cid == champ_id), "Unknown")
@@ -191,7 +171,7 @@ async def on_champ_select(connection, event):
                         f'/lol-champ-select/v1/session/actions/{action_id}',
                         data={"championId": champ_id, "completed": True}
                     )
-                    print(f"[INFO] Champion picked: {champ_name} (ID: {champ_id})")
+                    logging.info(f"Champion picked: {champ_name} (ID: {champ_id})")
                     return
     else:
         picked_champion = False
@@ -202,12 +182,14 @@ async def on_ready_check(connection, event):
     Event: Ready Check pops up.
     Purpose: Automatically accept ready check when it appears.
     """
-    bring_client_to_front()
+    if is_duplicate_event('ready_check', event.data, last_event):
+        return
+    bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
     global in_ready_check
     if event.data.get('state') == 'InProgress' and event.data.get('playerResponse') == 'None':
         if not in_ready_check:
             await connection.request('post', '/lol-matchmaking/v1/ready-check/accept')
-            print("[INFO] Accepted ready check.")
+            logging.info("Accepted ready check.")
             in_ready_check = True
     elif event.data.get('state') != 'InProgress':
         in_ready_check = False  # Reset flag when not in ready check
@@ -218,17 +200,19 @@ async def on_game_launch(connection, event):
     Event: Gameflow phase updated.
     Purpose: Start bot when game begins, handle cleanup when game ends.
     """
+    if is_duplicate_event('gameflow_phase', event.data, last_event):
+        return
     global game_started
     phase = event.data
-    print(f"[EVENT] Gameflow phase: {phase}")
+    logging.info(f"[EVENT] Gameflow phase: {phase}")
     if phase == "InProgress":
         game_started = True
-        print("[EVENT] Game started. Running bot...")
+        logging.info("[EVENT] Game started. Running bot...")
         run_arena_bot()
     else:
         game_started = False  # Reset flag when not in game
         if phase == "EndOfGame":
-            print("[EVENT] Game ended. Cleanup or exit logic here.")
+            logging.info("[EVENT] Game ended. Cleanup or exit logic here.")
 
 @connector.close
 async def disconnect(_):
@@ -236,13 +220,20 @@ async def disconnect(_):
     Event: League Client exited.
     Purpose: Notify user that the client has closed.
     """
-    print("[INFO] League Client has been closed.")
+    if is_duplicate_event('disconnect', None, last_event):
+        return
+    logging.info("[INFO] League Client has been closed.")
 
 
+
+# ===========================
+# Main Entry Point
+# ===========================
 
 if __name__ == "__main__":
-    setup_logging()
-    print("Press END key to exit anytime.")
+    disable_insecure_request_warning()
+    enable_logging()
+    logging.info("Press END key to exit anytime.")
     threading.Thread(target=listen_for_exit_key, daemon=True).start()
     while True:
         choice = show_menu()
@@ -256,4 +247,4 @@ if __name__ == "__main__":
         elif choice == "3":
             change_settings()
         else:
-            print("Invalid selection. Please try again.")
+            logging.warning("Invalid selection. Please try again.")

@@ -9,12 +9,11 @@ import logging
 from core.constants import (
     HEALTH_TICK_COLOR, ENEMY_HEALTH_BAR_COLOR, SCREEN_CENTER
 )
-from utils.general_utils import click_percent_relative
+from utils.general_utils import click_percent_relative, poll_game_data
 from utils.game_utils import (
     load_game_settings,
     move_random_offset,
     move_to_ally,
-    poll_game_data,
     find_champion_location,
     initialize_game_script,
     buy_recommended_items,

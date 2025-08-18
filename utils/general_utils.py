@@ -1,4 +1,6 @@
+import datetime
 import os
+import requests
 import win32gui
 import win32api
 import win32con
@@ -8,15 +10,70 @@ import mss
 import numpy as np
 import cv2
 import logging
-from core.constants import TESSERACT_PATH
+from core.constants import DEFAULT_API_TIMEOUT, LEAGUE_CLIENT_WINDOW_TITLE, LIVE_CLIENT_URL, TESSERACT_PATH
 import pytesseract
 from PIL import Image
 
 # ===========================
+# API Utilities
+# ===========================
+
+
+def is_duplicate_event(event_key, event_data, last_event_dict, threshold=1.0):
+    """
+    Returns True if the event is a duplicate within the threshold (seconds).
+    Args:
+        event_key (str): Unique key for the event type.
+        event_data (any): Data to compare for deduplication.
+        last_event_dict (dict): State dictionary for deduplication.
+        threshold (float): Time window in seconds to consider duplicates.
+    Returns:
+        bool: True if duplicate, False otherwise.
+    """
+    import time
+    now = time.time()
+    last = last_event_dict.get(event_key)
+    if last and last['data'] == event_data and now - last['time'] < threshold:
+        return True
+    last_event_dict[event_key] = {'data': event_data, 'time': now}
+    return False
+
+
+def retrieve_game_data():
+    """
+    Retrieves all game data from the League client API.
+    Returns:
+        dict or None: Game data if successful, else None.
+    """
+    try:
+        res = requests.get(f"{LIVE_CLIENT_URL}/allgamedata", timeout=DEFAULT_API_TIMEOUT, verify=False)
+        if res.status_code == 200:
+            return res.json()
+        else:
+            print("[ERROR] Game data request failed.")
+            return None
+    except Exception as e:
+        print(f"[ERROR] Game data request failed: {e}")
+        return None
+
+
+def poll_game_data(latest_game_data_container, poll_time=2):
+    """
+    Continuously polls game data and updates the provided container.
+    Args:
+        latest_game_data_container (dict): Container to store latest data.
+        poll_time (int): Poll interval in seconds.
+    """
+    while True:
+        latest_game_data_container['data'] = retrieve_game_data()
+        time.sleep(poll_time)
+
+    
+# ===========================
 # Mouse and Keyboard Actions
 # ===========================
 
-# Click at a position specified by percent of screen size (absolute)
+
 def click_percent_absolute(x_percent, y_percent, button="left"):
     """
     Clicks at a position specified by x_percent and y_percent of the foreground window size.
@@ -50,7 +107,7 @@ def click_percent_absolute(x_percent, y_percent, button="left"):
     else:
         print(f"[WARN] Unknown mouse button: {button}. Use 'left' or 'right'.")
 
-# Click at an absolute position, with optional percent offset
+
 def click_percent_relative(x, y, x_offset_percent=0, y_offset_percent=0, button="left"):
     """
     Clicks at (x, y) plus an optional offset specified as percent of window size.
@@ -101,7 +158,6 @@ def listen_for_exit_key():
 # Screen Data Retrieval & OCR
 # ===========================
 
-# Take a screenshot of the primary monitor
 def get_screenshot():
     """
     Captures a screenshot of the primary monitor.
@@ -116,7 +172,7 @@ def get_screenshot():
             img = img[:, :, :3]
         return img
 
-# Extract text from the screen using OCR
+
 def extract_screen_text():
     """
     Extracts text from the current screen using Tesseract OCR.
@@ -136,7 +192,7 @@ def extract_screen_text():
     print(text)
     return text
 
-# Extract text and their locations from the screen using OCR
+
 def extract_text_with_locations():
     """
     Extracts text and their bounding boxes from the screen using Tesseract OCR.
@@ -171,7 +227,7 @@ def extract_text_with_locations():
 
     return lines  # Dictionary: line_num -> list of {'text', 'box'}
 
-# Find the location of a specific text on the screen
+
 def find_text_location(target_text):
     """
     Finds the location of the specified text on the screen using OCR.
@@ -189,3 +245,50 @@ def find_text_location(target_text):
     logging.info(f"OCR: Text '{target_text}' not found on screen.")
     return None
 
+# ===========================
+# Client Utilities
+# ===========================
+
+def bring_window_to_front(window_title):
+    """
+    Brings the specified window to the foreground.
+    Args:
+        window_title (str): The title of the window to bring to front.
+    """
+    hwnd = win32gui.FindWindow(None, window_title)
+    if hwnd:
+        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        win32gui.SetForegroundWindow(hwnd)
+        time.sleep(0.2)
+    else:
+        print(f"[WARNING] {window_title} window not found.")
+
+def start_queue_loop(click_func):
+    """
+    Periodically brings the client to the front and clicks the queue button.
+    Args:
+        window_title (str): The title of the window to bring to front.
+        click_func (callable): Function to perform the click action.
+    """
+    while True:
+        bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
+        click_func(40, 95)
+        time.sleep(5)
+
+def enable_logging(log_file=None, level=logging.INFO):
+    if log_file is None:
+        if not os.path.exists("logs"):
+            os.makedirs("logs")
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
+        log_file = f"logs/{timestamp}.log"
+    log_format = "%(asctime)s [%(levelname)s] %(message)s"
+    date_format = "%Y-%m-%d %H:%M:%S"  # year, month, day, hour, minute, second
+    logging.basicConfig(
+        level=level,
+        format=log_format,
+        datefmt=date_format,
+        handlers=[
+            logging.FileHandler(log_file, mode='a', encoding='utf-8'),
+            logging.StreamHandler()
+        ]
+    )
