@@ -1,4 +1,4 @@
-import sys
+import os
 import win32gui
 import win32api
 import win32con
@@ -91,9 +91,10 @@ def listen_for_exit_key():
     """
     Listens for the END key and exits the program immediately.
     """
+    logging.info("Listening for END key to exit...")
     keyboard.wait("end")
     logging.info("END key pressed. Exiting program...")
-    sys.exit(0)
+    os._exit(0)
 
 
 # ===========================
