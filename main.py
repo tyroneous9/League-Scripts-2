@@ -9,7 +9,6 @@ from utils.general_utils import bring_window_to_front, is_duplicate_event, liste
 from core.change_settings import launch_keybind_gui
 from core.run_arena import run_arena_bot
 from lcu_driver import Connector
-import win32gui
 import logging
 
 processes = []
@@ -85,18 +84,11 @@ async def connect(connection):
     global summoner_id, champions_map
     logging.info("Connected to League Client, waiting for window to load...")
 
-    hwnd = None
     for _ in range(60):  # Timeout for client window
-        hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
-        if hwnd:
+        if bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE):
             break
         logging.info("League client window not found, retrying...")
         time.sleep(1)
-    if hwnd:
-        try:
-            bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
-        except Exception as e:
-            logging.error(f"Could not bring League of Legends to front: {e}")
     else:
         logging.error("League client window not available. Aborting script.")
         return
@@ -240,6 +232,7 @@ async def disconnect(_):
 if __name__ == "__main__":
     disable_insecure_request_warning()
     enable_logging()
+    logging.info("Logging test: This should appear in the log file and console.")
     logging.info("Press END key to exit anytime.")
     threading.Thread(target=listen_for_exit_key, daemon=True).start()
     while True:

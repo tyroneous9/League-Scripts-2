@@ -215,6 +215,7 @@ def find_text_location(target_text):
 # Client Utilities
 # ===========================
 
+
 def bring_window_to_front(window_title):
     """
     Brings the specified window to the foreground.
@@ -224,12 +225,14 @@ def bring_window_to_front(window_title):
     hwnd = win32gui.FindWindow(None, window_title)
     if hwnd:
         try:
-            win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
+            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
             win32gui.SetForegroundWindow(hwnd)
+            return True
         except Exception as e:
             logging.error(f"Could not bring {window_title} to front: {e}")
     else:
         logging.warning(f"{window_title} window not found.")
+    return False
 
 def start_queue_loop():
     """
@@ -241,6 +244,12 @@ def start_queue_loop():
         bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
         click_percent(40, 95)
         time.sleep(5)
+
+
+# ===========================
+# Logging Utilities
+# ===========================
+
 
 def enable_logging(log_file=None, level=logging.INFO):
     if log_file is None:
