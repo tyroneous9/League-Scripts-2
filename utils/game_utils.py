@@ -7,7 +7,7 @@ import logging
 from core.constants import DEFAULT_API_TIMEOUT, LIVE_CLIENT_URL, SCREEN_CENTER
 import random
 from utils.config_utils import disable_insecure_request_warning, load_settings
-from utils.general_utils import click_percent_relative, find_text_location, get_screenshot, enable_logging
+from utils.general_utils import click_percent, find_text_location, get_screenshot, enable_logging
 
 
 # ===========================
@@ -133,10 +133,10 @@ def buy_recommended_items():
     x, y = shop_location[:2]
 
     # Buy recommended item
-    click_percent_relative(x, y, 0, -60, "left")
-    click_percent_relative(x, y, 15, -25, "right")
-    click_percent_relative(x, y, 15, -25, "right")
-    click_percent_relative(x, y, 15, -25, "right")
+    click_percent(x, y, 0, -60, "left")
+    click_percent(x, y, 15, -25, "right")
+    click_percent(x, y, 15, -25, "right")
+    click_percent(x, y, 15, -25, "right")
 
     # Close shop
     keyboard.send(_keybinds.get("shop"))
@@ -159,7 +159,7 @@ def move_to_ally(ally_number=1):
     # Move randomly near ally
     offset_x = random.randint(-15, 15)  # percent offset
     offset_y = random.randint(-15, 15)  # percent offset
-    click_percent_relative(SCREEN_CENTER[0], SCREEN_CENTER[1], offset_x, offset_y, "right")
+    click_percent(SCREEN_CENTER[0], SCREEN_CENTER[1], offset_x, offset_y, "right")
 
 def move_random_offset(x, y, max_offset=15):
     """
@@ -171,6 +171,6 @@ def move_random_offset(x, y, max_offset=15):
     """
     offset_x = random.randint(-max_offset, max_offset)  # percent offset
     offset_y = random.randint(-max_offset, max_offset)  # percent offset
-    click_percent_relative(x, y, offset_x, offset_y, "right")
+    click_percent(x, y, offset_x, offset_y, "right")
 
 

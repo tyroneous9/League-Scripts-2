@@ -74,41 +74,7 @@ def poll_game_data(latest_game_data_container, poll_time=2):
 # ===========================
 
 
-def click_percent_absolute(x_percent, y_percent, button="left"):
-    """
-    Clicks at a position specified by x_percent and y_percent of the foreground window size.
-    Args:
-        x_percent (float): X position as percent of window width.
-        y_percent (float): Y position as percent of window height.
-        button (str): 'left' or 'right' mouse button.
-    """
-    hwnd = win32gui.GetForegroundWindow()
-    if hwnd is None:
-        print("[WARN] Window handle is None.")
-        return
-    rect = win32gui.GetWindowRect(hwnd)
-    left, top, right, bottom = rect
-    window_width = right - left
-    window_height = bottom - top
-    x = int(left + window_width * (x_percent / 100.0))
-    y = int(top + window_height * (y_percent / 100.0))
-    win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-    win32gui.SetForegroundWindow(hwnd)
-    time.sleep(0.2)
-    win32api.SetCursorPos((x, y))
-    if button == "left":
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
-        time.sleep(0.05)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
-    elif button == "right":
-        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
-        time.sleep(0.05)
-        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, x, y, 0, 0)
-    else:
-        print(f"[WARN] Unknown mouse button: {button}. Use 'left' or 'right'.")
-
-
-def click_percent_relative(x, y, x_offset_percent=0, y_offset_percent=0, button="left"):
+def click_percent(x, y, x_offset_percent=0, y_offset_percent=0, button="left"):
     """
     Clicks at (x, y) plus an optional offset specified as percent of window size.
     Args:
@@ -257,22 +223,23 @@ def bring_window_to_front(window_title):
     """
     hwnd = win32gui.FindWindow(None, window_title)
     if hwnd:
-        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-        win32gui.SetForegroundWindow(hwnd)
-        time.sleep(0.2)
+        try:
+            win32gui.ShowWindow(hwnd, win32con.SW_SHOW)
+            win32gui.SetForegroundWindow(hwnd)
+        except Exception as e:
+            logging.error(f"Could not bring {window_title} to front: {e}")
     else:
-        print(f"[WARNING] {window_title} window not found.")
+        logging.warning(f"{window_title} window not found.")
 
-def start_queue_loop(click_func):
+def start_queue_loop():
     """
     Periodically brings the client to the front and clicks the queue button.
     Args:
         window_title (str): The title of the window to bring to front.
-        click_func (callable): Function to perform the click action.
     """
     while True:
         bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
-        click_func(40, 95)
+        click_percent(40, 95)
         time.sleep(5)
 
 def enable_logging(log_file=None, level=logging.INFO):

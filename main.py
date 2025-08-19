@@ -5,7 +5,7 @@ import tkinter as tk
 from tkinter import ttk
 from utils.config_utils import load_config, save_config, disable_insecure_request_warning
 from core.constants import SUPPORTED_MODES, LCU_GAMEFLOW_PHASE, LCU_CHAMP_SELECT_SESSION, LCU_MATCHMAKING_READY_CHECK, LEAGUE_CLIENT_WINDOW_TITLE
-from utils.general_utils import bring_window_to_front, is_duplicate_event, listen_for_exit_key, start_queue_loop, listen_for_exit_key, is_duplicate_event, start_queue_loop, enable_logging
+from utils.general_utils import bring_window_to_front, is_duplicate_event, listen_for_exit_key, start_queue_loop, enable_logging
 from core.change_settings import launch_keybind_gui
 from core.run_arena import run_arena_bot
 from lcu_driver import Connector
@@ -78,7 +78,7 @@ def set_game_mode():
 async def connect(connection):
     """
     Event: League Client found.
-    Purpose: Fetch summoner data and start queue loop.
+    Purpose: Fetch summoner data.
     """
     if is_duplicate_event('connect', None, last_event):
         return
@@ -88,17 +88,18 @@ async def connect(connection):
     hwnd = None
     for _ in range(60):  # Timeout for client window
         hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
-        if hwnd and win32gui.IsWindow(hwnd):
-            bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
+        if hwnd:
             break
         logging.info("League client window not found, retrying...")
         time.sleep(1)
-    if not hwnd:
+    if hwnd:
+        try:
+            bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
+        except Exception as e:
+            logging.error(f"Could not bring League of Legends to front: {e}")
+    else:
         logging.error("League client window not available. Aborting script.")
         return
-
-    # Start queue
-    threading.Thread(target=start_queue_loop, daemon=True).start()
 
     # Fetch summoner ID
     summoner = await connection.request('get', '/lol-summoner/v1/current-summoner')
@@ -195,16 +196,22 @@ async def on_ready_check(connection, event):
         in_ready_check = False  # Reset flag when not in ready check
 
 @connector.ws.register(LCU_GAMEFLOW_PHASE, event_types=('UPDATE',))
-async def on_game_launch(connection, event):
+async def on_gameflow_phase(connection, event):
     """
     Event: Gameflow phase updated.
-    Purpose: Start bot when game begins, handle cleanup when game ends.
+    Purpose: Handle lobby, game start, and cleanup.
     """
     if is_duplicate_event('gameflow_phase', event.data, last_event):
         return
     global game_started
     phase = event.data
     logging.info(f"[EVENT] Gameflow phase: {phase}")
+
+    if phase == "Lobby":
+        # Start queue when player is in lobby
+        # threading.Thread(target=start_queue_loop, daemon=True).start()
+        logging.info("[EVENT] Player is in lobby. Queue loop started.")
+
     if phase == "InProgress":
         game_started = True
         logging.info("[EVENT] Game started. Running bot...")
@@ -238,7 +245,6 @@ if __name__ == "__main__":
     while True:
         choice = show_menu()
         if choice == "0":
-            connector.stop()
             break
         elif choice == "1":
             run_script()

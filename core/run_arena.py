@@ -9,7 +9,7 @@ import logging
 from core.constants import (
     HEALTH_TICK_COLOR, ENEMY_HEALTH_BAR_COLOR, SCREEN_CENTER
 )
-from utils.general_utils import click_percent_relative, poll_game_data
+from utils.general_utils import click_percent, poll_game_data
 from utils.game_utils import (
     load_game_settings,
     move_random_offset,
@@ -40,7 +40,7 @@ def shop_phase():
     """
     logging.info("Running shop phase...")
     # Click screen center in case of augment card
-    click_percent_relative(SCREEN_CENTER[0], SCREEN_CENTER[1])
+    click_percent(SCREEN_CENTER[0], SCREEN_CENTER[1])
 
     # Buy recommended items
     buy_recommended_items()
@@ -64,7 +64,7 @@ def combat_phase():
     enemy_location = find_champion_location(ENEMY_HEALTH_BAR_COLOR, HEALTH_TICK_COLOR)
     if enemy_location:
         # Move to enemy
-        click_percent_relative(enemy_location[0], enemy_location[1], 0, 0, "right")
+        click_percent(enemy_location[0], enemy_location[1], 0, 0, "right")
         # Use spells and items
         keyboard.send(_keybinds.get("spell_1"))
         keyboard.send(_keybinds.get("spell_2"))
