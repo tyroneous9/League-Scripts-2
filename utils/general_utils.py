@@ -223,6 +223,7 @@ def bring_window_to_front(window_title):
         window_title (str): The title of the window to bring to front.
     """
     hwnd = win32gui.FindWindow(None, window_title)
+    win32gui.SetForegroundWindow(hwnd)
     if hwnd:
         try:
             win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
@@ -233,6 +234,19 @@ def bring_window_to_front(window_title):
     else:
         logging.warning(f"{window_title} window not found.")
     return False
+
+def bring_client_to_front():
+    """
+    Brings the League Client window to the foreground.
+    """
+    hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
+    if hwnd:
+        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        win32gui.SetForegroundWindow(hwnd)
+        time.sleep(0.2)
+    else:
+        logging.warning(f"{LEAGUE_CLIENT_WINDOW_TITLE} window not found.")
+
 
 def start_queue_loop():
     """
