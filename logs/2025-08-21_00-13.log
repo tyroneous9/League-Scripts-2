@@ -1,0 +1,51 @@
+2025-08-21 00:13:01 [INFO] Press END key to exit anytime.
+2025-08-21 00:13:01 [INFO] Listening for END key to exit...
+2025-08-21 00:13:02 [INFO] Starting Script. Waiting for client...
+2025-08-21 00:13:02 [INFO] Connected to League Client, waiting for window...
+2025-08-21 00:13:02 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:02 [INFO] League client window not found, retrying...
+2025-08-21 00:13:03 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:03 [INFO] League client window not found, retrying...
+2025-08-21 00:13:04 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:04 [INFO] League client window not found, retrying...
+2025-08-21 00:13:05 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:05 [INFO] League client window not found, retrying...
+2025-08-21 00:13:06 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:06 [INFO] League client window not found, retrying...
+2025-08-21 00:13:07 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:07 [INFO] League client window not found, retrying...
+2025-08-21 00:13:08 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:08 [INFO] League client window not found, retrying...
+2025-08-21 00:13:09 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:09 [INFO] League client window not found, retrying...
+2025-08-21 00:13:10 [ERROR] Could not bring League of Legends to front: name 'win32process' is not defined
+2025-08-21 00:13:10 [INFO] League client window not found, retrying...
+2025-08-21 00:13:10 [INFO] Event loop interrupted by keyboard
+2025-08-21 00:14:02 [WARNING] Invalid selection. Please try again.
+2025-08-21 00:14:04 [INFO] Starting Script. Waiting for client...
+2025-08-21 00:14:04 [ERROR] Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000019EDB7BA8D0>
+2025-08-21 00:14:04 [ERROR] Task was destroyed but it is pending!
+task: <Task pending name='Task-4' coro=<ConnectorEventManager.run_event() running at C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\site-packages\lcu_driver\events\managers.py:30> wait_for=<Task finished name='Task-5' coro=<connect() done, defined at c:\Users\Wesley\Documents\GitHub\League-Scripts-2\main.py:72> exception=KeyboardInterrupt()>>
+2025-08-21 00:14:04 [ERROR] Task exception was never retrieved
+future: <Task finished name='Task-5' coro=<connect() done, defined at c:\Users\Wesley\Documents\GitHub\League-Scripts-2\main.py:72> exception=KeyboardInterrupt()>
+Traceback (most recent call last):
+  File "C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\site-packages\lcu_driver\connector.py", line 70, in start
+    wrapper()
+  File "C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\site-packages\lcu_driver\connector.py", line 64, in wrapper
+    self.loop.run_until_complete(connection.init())
+  File "C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 641, in run_until_complete
+    self.run_forever()
+  File "C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\asyncio\windows_events.py", line 321, in run_forever
+    super().run_forever()
+  File "C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 608, in run_forever
+    self._run_once()
+  File "C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\asyncio\base_events.py", line 1936, in _run_once
+    handle._run()
+  File "C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\asyncio\events.py", line 84, in _run
+    self._context.run(self._callback, *self._args)
+  File "c:\Users\Wesley\Documents\GitHub\League-Scripts-2\main.py", line 83, in connect
+    time.sleep(1)
+KeyboardInterrupt
+2025-08-21 00:14:05 [ERROR] Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000019EDB7B7A10>

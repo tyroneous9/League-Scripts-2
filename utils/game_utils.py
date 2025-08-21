@@ -4,10 +4,10 @@ import time
 import numpy as np
 import cv2
 import logging
-from core.constants import DEFAULT_API_TIMEOUT, LIVE_CLIENT_URL, SCREEN_CENTER
+from core.constants import SCREEN_CENTER
 import random
-from utils.config_utils import disable_insecure_request_warning, load_settings
-from utils.general_utils import click_percent, find_text_location, get_screenshot, enable_logging
+from utils.config_utils import load_settings
+from utils.general_utils import click_percent, find_text_location, get_screenshot
 
 
 # ===========================
@@ -21,16 +21,7 @@ def load_game_settings():
         tuple: (keybinds dict, general settings dict)
     """
     keybinds, general = load_settings()
-    logging.info("Keybinds and general settings loaded.")
     return keybinds, general
-
-def initialize_game_script():
-    """
-    Performs all game-related initialization
-    """
-    enable_logging()
-    disable_insecure_request_warning()
-    logging.info("Game utilities initialized.")
 
 
 # ===========================

@@ -1,0 +1,26 @@
+2025-08-21 00:10:05 [INFO] Press END key to exit anytime.
+2025-08-21 00:10:05 [INFO] Listening for END key to exit...
+2025-08-21 00:10:08 [INFO] END key pressed. Exiting program...
+2025-08-21 00:10:20 [INFO] Press END key to exit anytime.
+2025-08-21 00:10:20 [INFO] Listening for END key to exit...
+2025-08-21 00:10:21 [INFO] Starting Script. Waiting for client...
+2025-08-21 00:10:22 [INFO] Connected to League Client, waiting for window...
+2025-08-21 00:10:39 [INFO] [EVENT] Gameflow phase: Lobby
+2025-08-21 00:10:39 [INFO] [EVENT] Starting queue.
+2025-08-21 00:10:57 [INFO] Event loop interrupted by keyboard
+2025-08-21 00:12:55 [WARNING] Invalid selection. Please try again.
+2025-08-21 00:12:57 [ERROR] Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002556F505310>
+2025-08-21 00:12:57 [ERROR] Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002556F2FD890>
+2025-08-21 00:12:57 [ERROR] Task exception was never retrieved
+future: <Task finished name='Task-4' coro=<ConnectorEventManager.run_event() done, defined at C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\site-packages\lcu_driver\events\managers.py:28> exception=error(0, 'SetForegroundWindow', 'No error message is available')>
+Traceback (most recent call last):
+  File "C:\Users\Wesley\AppData\Local\Programs\Python\Python311\Lib\site-packages\lcu_driver\events\managers.py", line 30, in run_event
+    await asyncio.create_task(
+  File "c:\Users\Wesley\Documents\GitHub\League-Scripts-2\main.py", line 79, in connect
+    hwnd = bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Wesley\Documents\GitHub\League-Scripts-2\utils\general_utils.py", line 206, in bring_window_to_front
+    """
+pywintypes.error: (0, 'SetForegroundWindow', 'No error message is available')

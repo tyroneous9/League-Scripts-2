@@ -19,26 +19,6 @@ from PIL import Image
 # ===========================
 
 
-def is_duplicate_event(event_key, event_data, last_event_dict, threshold=1.0):
-    """
-    Returns True if the event is a duplicate within the threshold (seconds).
-    Args:
-        event_key (str): Unique key for the event type.
-        event_data (any): Data to compare for deduplication.
-        last_event_dict (dict): State dictionary for deduplication.
-        threshold (float): Time window in seconds to consider duplicates.
-    Returns:
-        bool: True if duplicate, False otherwise.
-    """
-    import time
-    now = time.time()
-    last = last_event_dict.get(event_key)
-    if last and last['data'] == event_data and now - last['time'] < threshold:
-        return True
-    last_event_dict[event_key] = {'data': event_data, 'time': now}
-    return False
-
-
 def retrieve_game_data():
     """
     Retrieves all game data from the League client API.
@@ -221,31 +201,20 @@ def bring_window_to_front(window_title):
     Brings the specified window to the foreground.
     Args:
         window_title (str): The title of the window to bring to front.
+    Returns:
+        bool: True if successful, False otherwise.
     """
     hwnd = win32gui.FindWindow(None, window_title)
-    win32gui.SetForegroundWindow(hwnd)
-    if hwnd:
-        try:
-            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-            win32gui.SetForegroundWindow(hwnd)
-            return True
-        except Exception as e:
-            logging.error(f"Could not bring {window_title} to front: {e}")
-    else:
+    if not hwnd:
         logging.warning(f"{window_title} window not found.")
-    return False
-
-def bring_client_to_front():
-    """
-    Brings the League Client window to the foreground.
-    """
-    hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
-    if hwnd:
+        return False
+    try:
         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
         win32gui.SetForegroundWindow(hwnd)
-        time.sleep(0.2)
-    else:
-        logging.warning(f"{LEAGUE_CLIENT_WINDOW_TITLE} window not found.")
+        return True
+    except Exception as e:
+        logging.error(f"Could not bring {window_title} to front: {e}")
+        return False
 
 
 def start_queue_loop():
@@ -256,7 +225,7 @@ def start_queue_loop():
     """
     while True:
         bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
-        click_percent(40, 95)
+        # click_percent(40, 95)
         time.sleep(5)
 
 
@@ -266,13 +235,16 @@ def start_queue_loop():
 
 
 def enable_logging(log_file=None, level=logging.INFO):
+    # Remove all handlers associated with the root logger object
+    for handler in logging.root.handlers[:]:
+        logging.root.removeHandler(handler)
     if log_file is None:
         if not os.path.exists("logs"):
             os.makedirs("logs")
         timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M")
         log_file = f"logs/{timestamp}.log"
     log_format = "%(asctime)s [%(levelname)s] %(message)s"
-    date_format = "%Y-%m-%d %H:%M:%S"  # year, month, day, hour, minute, second
+    date_format = "%Y-%m-%d %H:%M:%S"
     logging.basicConfig(
         level=level,
         format=log_format,

@@ -15,7 +15,6 @@ from utils.game_utils import (
     move_random_offset,
     move_to_ally,
     find_champion_location,
-    initialize_game_script,
     buy_recommended_items,
     level_up_abilities,
     sleep_random,
@@ -25,7 +24,6 @@ from utils.game_utils import (
 # Initialization
 # ===========================
 
-initialize_game_script()
 _keybinds, _general = load_game_settings()
 _latest_game_data = {'data': None}
 
