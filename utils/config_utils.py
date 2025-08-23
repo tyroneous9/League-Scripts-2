@@ -30,3 +30,12 @@ def disable_insecure_request_warning():
 def load_settings():
     config = load_config()
     return config.get("Keybinds", {}), config.get("General", {})
+
+def get_selected_game_mode():
+    config = load_config()
+    return config.get("General", {}).get("selected_game_mode", "aram")
+
+def set_selected_game_mode(mode):
+    config = load_config()
+    config["General"]["selected_game_mode"] = mode
+    save_config(config)

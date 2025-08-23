@@ -10,7 +10,7 @@ import mss
 import numpy as np
 import cv2
 import logging
-from core.constants import DEFAULT_API_TIMEOUT, LEAGUE_CLIENT_WINDOW_TITLE, LIVE_CLIENT_URL, TESSERACT_PATH
+from core.constants import DEFAULT_API_TIMEOUT, LIVE_CLIENT_URL, TESSERACT_PATH
 import pytesseract
 from PIL import Image
 
@@ -196,37 +196,37 @@ def find_text_location(target_text):
 # ===========================
 
 
-def bring_window_to_front(window_title):
-    """
-    Brings the specified window to the foreground.
-    Args:
-        window_title (str): The title of the window to bring to front.
-    Returns:
-        bool: True if successful, False otherwise.
-    """
-    hwnd = win32gui.FindWindow(None, window_title)
-    if not hwnd:
-        logging.warning(f"{window_title} window not found.")
-        return False
-    try:
-        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-        win32gui.SetForegroundWindow(hwnd)
-        return True
-    except Exception as e:
-        logging.error(f"Could not bring {window_title} to front: {e}")
-        return False
+# def bring_window_to_front(window_title):
+#     """
+#     Brings the specified window to the foreground.
+#     Args:
+#         window_title (str): The title of the window to bring to front.
+#     Returns:
+#         bool: True if successful, False otherwise.
+#     """
+#     hwnd = win32gui.FindWindow(None, window_title)
+#     if not hwnd:
+#         logging.warning(f"{window_title} window not found.")
+#         return False
+#     try:
+#         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+#         win32gui.SetForegroundWindow(hwnd)
+#         return True
+#     except Exception as e:
+#         logging.error(f"Could not bring {window_title} to front: {e}")
+#         return False
 
 
-def start_queue_loop():
-    """
-    Periodically brings the client to the front and clicks the queue button.
-    Args:
-        window_title (str): The title of the window to bring to front.
-    """
-    while True:
-        bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
-        # click_percent(40, 95)
-        time.sleep(5)
+# def start_queue_loop():
+#     """
+#     Periodically brings the client to the front and clicks the queue button.
+#     Args:
+#         window_title (str): The title of the window to bring to front.
+#     """
+#     while True:
+#         bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
+#         click_percent(40, 95)
+#         time.sleep(3)
 
 
 # ===========================

@@ -85,7 +85,7 @@ def combat_phase():
 # Main Bot Loop
 # ===========================
 
-def run_arena_bot():
+def run_game_loop():
     """
     Main loop for Arena bot:
     - Waits for GameStart event before starting main loop
@@ -119,15 +119,5 @@ def run_arena_bot():
         prev_level = current_level if current_level is not None else prev_level
 
         combat_phase()
-
-
-# ===========================
-# Main Entry Point
-# ===========================
-
-if __name__ == "__main__":
-    logging.info("Arena bot started.")
-    run_arena_bot()
-
 
 

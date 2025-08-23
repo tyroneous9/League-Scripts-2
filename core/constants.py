@@ -32,11 +32,21 @@ KEY_PRESS_DELAY = 0.05
 # Supported Game Modes
 # ===========================
 
-# Maps mode names to their runner scripts (now just names for direct calls)
+# Maps mode names to their runner scripts and queue IDs
 SUPPORTED_MODES = {
-    "arena": "run_arena",
-    # "aram": "run_aram",
-    # "swiftplay": "run_swiftplay",
+    "arena": {
+        "module": "core.run_arena",
+        "queue_id": 1700
+    },
+    "aram": {
+        "module": "core.run_aram",
+        "queue_id": 450
+    },
+    "swiftplay": {
+        "module": "core.run_swiftplay",
+        "queue_id": 490
+    },
+    # Add more modes as needed
 }
 
 # ===========================
