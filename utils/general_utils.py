@@ -37,14 +37,16 @@ def retrieve_game_data():
         return None
 
 
-def poll_game_data(latest_game_data_container, poll_time=2):
+def poll_game_data(latest_game_data_container, stop_event, poll_time=2):
     """
     Continuously polls game data and updates the provided container.
+    Exits when stop_event is set.
     Args:
         latest_game_data_container (dict): Container to store latest data.
+        stop_event (threading.Event): Event to signal polling should stop.
         poll_time (int): Poll interval in seconds.
     """
-    while True:
+    while not stop_event.is_set():
         latest_game_data_container['data'] = retrieve_game_data()
         time.sleep(poll_time)
 
@@ -94,7 +96,7 @@ def listen_for_exit_key():
     """
     Listens for the END key and exits the program immediately.
     """
-    logging.info("Listening for END key to exit...")
+    logging.info("Press END key to exit anytime.")
     keyboard.wait("end")
     logging.info("END key pressed. Exiting program...")
     os._exit(0)

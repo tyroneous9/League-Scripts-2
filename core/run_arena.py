@@ -36,7 +36,6 @@ def shop_phase():
     """
     Handles the Arena shop phase which is detected upon level up
     """
-    logging.info("Running shop phase...")
     # Click screen center in case of augment card
     click_percent(SCREEN_CENTER[0], SCREEN_CENTER[1])
 
@@ -53,7 +52,7 @@ def combat_phase():
     - Finds enemy champion location and attacks w/ spells and items
     - If no enemy found, find and move toward ally
     """
-    logging.info("Running combat phase...")
+
     center_camera_key = _keybinds.get("center_camera")
     keyboard.press(center_camera_key)
     time.sleep(0.1)
@@ -85,7 +84,7 @@ def combat_phase():
 # Main Bot Loop
 # ===========================
 
-def run_game_loop():
+def run_game_loop(stop_event):
     """
     Main loop for Arena bot:
     - Waits for GameStart event before starting main loop
@@ -93,21 +92,14 @@ def run_game_loop():
     - Otherwise runs combat phase
     - Exits when monitor_game_end detects game end
     """
-    # API Threads
-    polling_thread = threading.Thread(target=poll_game_data, args=(_latest_game_data,), daemon=True)
+
+    # Game initialization
+    polling_thread = threading.Thread(target=poll_game_data, args=(_latest_game_data, stop_event), daemon=True)
     polling_thread.start()
-
-    logging.info("Waiting for GameStart event...")
-    while True:
-        game_data = _latest_game_data.get('data')
-        if game_data:
-            events = game_data.get("events", {}).get("Events", [])
-            if any(e.get("EventName", "").lower() == "gamestart" for e in events):
-                logging.info("GameStart detected. Starting main loop.")
-                break
-
     prev_level = 0
-    while True:
+    logging.info("Bot has started.")
+
+    while not stop_event.is_set():
         game_data = _latest_game_data.get('data')
         current_level = game_data["activePlayer"].get("level") if game_data else None
 
@@ -119,5 +111,3 @@ def run_game_loop():
         prev_level = current_level if current_level is not None else prev_level
 
         combat_phase()
-
-
