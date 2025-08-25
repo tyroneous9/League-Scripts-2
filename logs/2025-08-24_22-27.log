@@ -1,0 +1,17 @@
+2025-08-24 22:27:01 [INFO] Press END key to exit anytime.
+2025-08-24 22:27:02 [INFO] Starting Script. Waiting for client...
+2025-08-24 22:27:03 [INFO] Connected to League Client, waiting for window...
+2025-08-24 22:27:03 [INFO] [EVENT] Starting queue.
+2025-08-24 22:27:05 [INFO] Attempting to pick preferred champion: Lee Sin of ID 64
+2025-08-24 22:27:05 [INFO] Attempting to pick preferred champion: Lee Sin of ID 64
+2025-08-24 22:27:06 [INFO] Attempting to pick preferred champion: Lee Sin of ID 64
+2025-08-24 22:27:06 [INFO] Attempting to pick preferred champion: Lee Sin of ID 64
+2025-08-24 22:27:06 [INFO] Attempting to pick preferred champion: Lee Sin of ID 64
+2025-08-24 22:27:08 [INFO] Event loop interrupted by keyboard
+2025-08-24 22:27:08 [ERROR] Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000198E411B590>
+2025-08-24 22:27:08 [ERROR] Unclosed connector
+connections: ['deque([(<aiohttp.client_proto.ResponseHandler object at 0x00000198E42CE200>, 2502.046), (<aiohttp.client_proto.ResponseHandler object at 0x00000198E42CE820>, 2502.046), (<aiohttp.client_proto.ResponseHandler object at 0x00000198E42CEB30>, 2502.046), (<aiohttp.client_proto.ResponseHandler object at 0x00000198E42CE900>, 2502.046)])']
+connector: <aiohttp.connector.TCPConnector object at 0x00000198E411B850>
+2025-08-24 22:27:08 [ERROR] Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000198E411A090>

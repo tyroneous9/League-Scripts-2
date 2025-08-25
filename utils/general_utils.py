@@ -10,7 +10,10 @@ import mss
 import numpy as np
 import cv2
 import logging
-from core.constants import DEFAULT_API_TIMEOUT, LIVE_CLIENT_URL, TESSERACT_PATH
+from core.constants import (
+    DEFAULT_API_TIMEOUT, LIVE_CLIENT_URL, TESSERACT_PATH,
+    DATA_DRAGON_VERSIONS_URL, DATA_DRAGON_DEFAULT_LOCALE
+)
 import pytesseract
 from PIL import Image
 
@@ -19,9 +22,9 @@ from PIL import Image
 # ===========================
 
 
-def retrieve_game_data():
+def fetch_live_client_data():
     """
-    Retrieves all game data from the League client API.
+    Retrieves all game data from the live client API.
     Returns:
         dict or None: Game data if successful, else None.
     """
@@ -30,16 +33,16 @@ def retrieve_game_data():
         if res.status_code == 200:
             return res.json()
         else:
-            print("[ERROR] Game data request failed.")
+            print("[ERROR] Game data request succeeded, but no data available.")
             return None
     except Exception as e:
-        print(f"[ERROR] Game data request failed: {e}")
+        print(f"[ERROR] Game data request failed.")
         return None
 
 
-def poll_game_data(latest_game_data_container, stop_event, poll_time=2):
+def poll_live_client_data(latest_game_data_container, stop_event, poll_time=0.2):
     """
-    Continuously polls game data and updates the provided container.
+    Continuously polls live client data and updates the provided container.
     Exits when stop_event is set.
     Args:
         latest_game_data_container (dict): Container to store latest data.
@@ -47,10 +50,45 @@ def poll_game_data(latest_game_data_container, stop_event, poll_time=2):
         poll_time (int): Poll interval in seconds.
     """
     while not stop_event.is_set():
-        latest_game_data_container['data'] = retrieve_game_data()
+        latest_game_data_container['data'] = fetch_live_client_data()
         time.sleep(poll_time)
 
-    
+
+def fetch_data_dragon_data(endpoint, version=None, locale=DATA_DRAGON_DEFAULT_LOCALE):
+    """
+    Fetches static data from Riot Data Dragon.
+    Args:
+        endpoint (str): The endpoint, e.g. "champion".
+        version (str, optional): Patch version. If None, fetches latest.
+        locale (str): Language code, default from constants.
+    Returns:
+        dict: The JSON data from Data Dragon, or {} on failure.
+    """
+    try:
+        if not version:
+            versions = requests.get(DATA_DRAGON_VERSIONS_URL, timeout=5).json()
+            version = versions[0]
+        url = f"https://ddragon.leagueoflegends.com/cdn/{version}/data/{locale}/{endpoint}.json"
+        resp = requests.get(url, timeout=10)
+        resp.raise_for_status()
+        return resp.json()
+    except Exception as e:
+        logging.error(f"Failed to fetch Data Dragon data for endpoint '{endpoint}': {e}")
+        return {}
+
+def get_champions_map():
+    """
+    Fetches champion data from Riot Data Dragon and returns a {name: id} mapping.
+    Returns:
+        dict: {champion_name: champion_id}
+    """
+    data = fetch_data_dragon_data("champion")
+    champions_map = {}
+    for champ in data.get("data", {}).values():
+        champions_map[champ["name"]] = int(champ["key"])
+    return champions_map
+
+
 # ===========================
 # Mouse and Keyboard Actions
 # ===========================
@@ -103,7 +141,7 @@ def listen_for_exit_key():
 
 
 # ===========================
-# Screen Data Retrieval & OCR
+# Screen Data
 # ===========================
 
 def get_screenshot():
@@ -192,48 +230,6 @@ def find_text_location(target_text):
                 return entry['box']
     logging.info(f"OCR: Text '{target_text}' not found on screen.")
     return None
-
-# ===========================
-# Client Utilities
-# ===========================
-
-
-# def bring_window_to_front(window_title):
-#     """
-#     Brings the specified window to the foreground.
-#     Args:
-#         window_title (str): The title of the window to bring to front.
-#     Returns:
-#         bool: True if successful, False otherwise.
-#     """
-#     hwnd = win32gui.FindWindow(None, window_title)
-#     if not hwnd:
-#         logging.warning(f"{window_title} window not found.")
-#         return False
-#     try:
-#         win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
-#         win32gui.SetForegroundWindow(hwnd)
-#         return True
-#     except Exception as e:
-#         logging.error(f"Could not bring {window_title} to front: {e}")
-#         return False
-
-
-# def start_queue_loop():
-#     """
-#     Periodically brings the client to the front and clicks the queue button.
-#     Args:
-#         window_title (str): The title of the window to bring to front.
-#     """
-#     while True:
-#         bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
-#         click_percent(40, 95)
-#         time.sleep(3)
-
-
-# ===========================
-# Logging Utilities
-# ===========================
 
 
 def enable_logging(log_file=None, level=logging.INFO):

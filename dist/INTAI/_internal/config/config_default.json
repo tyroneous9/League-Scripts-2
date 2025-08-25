@@ -23,6 +23,6 @@
     },
     "General": {
         "selected_game_mode": "Arena",
-        "champion_name": ""
+        "preferred_champion": ""
     }
 }

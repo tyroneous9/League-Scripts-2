@@ -9,7 +9,7 @@ import logging
 from core.constants import (
     HEALTH_TICK_COLOR, ENEMY_HEALTH_BAR_COLOR, SCREEN_CENTER
 )
-from utils.general_utils import click_percent, poll_game_data
+from utils.general_utils import click_percent, poll_live_client_data
 from utils.game_utils import (
     load_game_settings,
     move_random_offset,
@@ -17,6 +17,7 @@ from utils.game_utils import (
     find_champion_location,
     buy_recommended_items,
     level_up_abilities,
+    retreat_to_ally,
     sleep_random,
 )
 
@@ -75,6 +76,15 @@ def combat_phase():
         keyboard.send(_keybinds.get("item_6"))
         move_random_offset(*enemy_location, 15)
         sleep_random(0.1, 0.3)
+        # Self preservation
+        if _latest_game_data['data']:
+            current_hp = _latest_game_data['data']["activePlayer"].get("championStats", {}).get("currentHealth")
+            max_hp = _latest_game_data['data']["activePlayer"].get("championStats", {}).get("maxHealth")
+            hp_percent = (current_hp / max_hp)
+            if hp_percent < .3:
+                retreat_to_ally()
+                if(hp_percent == 0):
+                    return
     else:
         # Move to ally
         move_to_ally(1)
@@ -94,20 +104,28 @@ def run_game_loop(stop_event):
     """
 
     # Game initialization
-    polling_thread = threading.Thread(target=poll_game_data, args=(_latest_game_data, stop_event), daemon=True)
+    polling_thread = threading.Thread(target=poll_live_client_data, args=(_latest_game_data, stop_event), daemon=True)
     polling_thread.start()
     prev_level = 0
     logging.info("Bot has started.")
 
     while not stop_event.is_set():
-        game_data = _latest_game_data.get('data')
-        current_level = game_data["activePlayer"].get("level") if game_data else None
 
-        if current_level is not None and current_level > prev_level:
-            time.sleep(3)
-            for _ in range(current_level - prev_level):
-                shop_phase()
-
-        prev_level = current_level if current_level is not None else prev_level
+        if _latest_game_data['data']:
+            current_level = _latest_game_data['data']["activePlayer"].get("level")
+            if current_level > prev_level:
+                time.sleep(3)
+                for _ in range(current_level - prev_level):
+                    shop_phase()
+                prev_level = current_level if current_level else prev_level
+        else:
+            logging.warning("No game data available.")
 
         combat_phase()
+
+# For testing purposes
+# python -m core.run_arena
+if __name__ == "__main__":
+    time.sleep(2)
+    stop_event = threading.Event()
+    run_game_loop(stop_event)

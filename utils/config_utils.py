@@ -33,7 +33,7 @@ def load_settings():
 
 def get_selected_game_mode():
     config = load_config()
-    return config.get("General", {}).get("selected_game_mode", "aram")
+    return config.get("General", {}).get("selected_game_mode").lower()
 
 def set_selected_game_mode(mode):
     config = load_config()

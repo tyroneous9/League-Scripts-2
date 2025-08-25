@@ -151,6 +151,33 @@ def move_to_ally(ally_number=1):
     offset_y = random.randint(-15, 15)  # percent offset
     click_percent(SCREEN_CENTER[0], SCREEN_CENTER[1], offset_x, offset_y, "right")
 
+
+def retreat_to_ally():
+    """
+    Moves the player to the specified ally position and randomly presses summoner spell keys.
+    Sometimes presses only one, both, or none for added randomness.
+    """
+    # Move to ally position
+    move_to_ally()
+    time.sleep(0.1)
+
+    # Randomly use summoner spells
+    press_sum_1 = random.choice([True, False])
+    press_sum_2 = random.choice([True, False])
+
+    if press_sum_1:
+        sum_1_key = _keybinds.get("sum_1")
+        if sum_1_key:
+            keyboard.send(sum_1_key)
+            time.sleep(0.1)
+    if press_sum_2:
+        sum_2_key = _keybinds.get("sum_2")
+        if sum_2_key:
+            keyboard.send(sum_2_key)
+            time.sleep(0.1)
+    move_to_ally()
+
+
 def move_random_offset(x, y, max_offset=15):
     """
     Moves a random distance offset from the given (x, y) location using percent-based relative click.
@@ -162,5 +189,6 @@ def move_random_offset(x, y, max_offset=15):
     offset_x = random.randint(-max_offset, max_offset)  # percent offset
     offset_y = random.randint(-max_offset, max_offset)  # percent offset
     click_percent(x, y, offset_x, offset_y, "right")
+
 
 

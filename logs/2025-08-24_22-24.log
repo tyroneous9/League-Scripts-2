@@ -1,0 +1,20 @@
+2025-08-24 22:24:00 [INFO] Press END key to exit anytime.
+2025-08-24 22:24:01 [INFO] Starting Script. Waiting for client...
+2025-08-24 22:24:02 [INFO] Connected to League Client, waiting for window...
+2025-08-24 22:24:02 [INFO] [EVENT] Starting queue.
+2025-08-24 22:24:22 [INFO] Attempting to pick preferred champion:  of ID None
+2025-08-24 22:24:22 [INFO] Attempting to pick preferred champion:  of ID None
+2025-08-24 22:24:22 [INFO] Attempting to pick preferred champion:  of ID None
+2025-08-24 22:24:24 [INFO] Attempting to pick preferred champion:  of ID None
+2025-08-24 22:24:24 [INFO] Attempting to pick preferred champion:  of ID None
+2025-08-24 22:24:29 [INFO] [EVENT] Starting queue.
+2025-08-24 22:24:29 [INFO] Arena lobby created.
+2025-08-24 22:25:53 [INFO] Event loop interrupted by keyboard
+2025-08-24 22:25:53 [WARNING] Invalid selection. Please try again.
+2025-08-24 22:25:53 [WARNING] Invalid selection. Please try again.
+2025-08-24 22:25:53 [WARNING] Invalid selection. Please try again.
+2025-08-24 22:25:53 [WARNING] Invalid selection. Please try again.
+2025-08-24 22:25:54 [ERROR] Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000025973D89C90>
+2025-08-24 22:25:54 [ERROR] Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000025973F66F10>

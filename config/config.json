@@ -9,10 +9,10 @@
         "item_5": "6",
         "item_6": "7",
         "recall": "b",
-        "select_ally_1": "f1",
-        "select_ally_2": "f2",
-        "select_ally_3": "f3",
-        "select_ally_4": "f4",
+        "select_ally_1": "f2",
+        "select_ally_2": "f3",
+        "select_ally_3": "f4",
+        "select_ally_4": "f5",
         "shop": "p",
         "spell_1": "q",
         "spell_2": "w",
@@ -22,7 +22,7 @@
         "sum_2": "f"
     },
     "General": {
-        "selected_game_mode": "arena",
-        "champion_name": ""
+        "selected_game_mode": "Arena",
+        "preferred_champion": "Lee Sin"
     }
 }

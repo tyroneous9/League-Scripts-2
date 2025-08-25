@@ -1,19 +1,26 @@
+# python -m core.main
+
 import asyncio
 import threading
 import time
 import random
-import tkinter as tk
-from tkinter import ttk
+import importlib
 from utils.config_utils import (
-    disable_insecure_request_warning, get_selected_game_mode, set_selected_game_mode
+    disable_insecure_request_warning, get_selected_game_mode, set_selected_game_mode, load_config
 )
-from core.constants import SUPPORTED_MODES, LCU_GAMEFLOW_PHASE, LCU_CHAMP_SELECT_SESSION, LEAGUE_CLIENT_WINDOW_TITLE
-from utils.general_utils import listen_for_exit_key, enable_logging
+from core.constants import (
+    SUPPORTED_MODES,
+    LCU_GAMEFLOW_PHASE,
+    LCU_CHAMP_SELECT_SESSION,
+    LEAGUE_CLIENT_WINDOW_TITLE,
+    GAMEFLOW_PHASES,
+    CHAMP_SELECT_SUBPHASES
+)
+from utils.general_utils import listen_for_exit_key, enable_logging, get_champions_map
 from core.change_settings import launch_keybind_gui
 from lcu_driver import Connector
 import logging
 import win32gui
-import importlib
 
 connector = Connector()
 
@@ -26,21 +33,23 @@ game_loop_thread = None
 
 def run_game_loop(stop_event):
     """
-    Dynamically imports and runs the correct bot loop for the selected game mode.
+    Runs the correct bot loop for the selected game mode.
     The loop should exit when stop_event is set (signaled by EndOfGame phase).
     """
-    selected_game_mode = get_selected_game_mode().lower()
+    selected_game_mode = get_selected_game_mode()
     mode_info = SUPPORTED_MODES.get(selected_game_mode)
     module_name = mode_info.get("module")
-    if not module_name:
-        logging.error(f"No module defined for game mode '{selected_game_mode}'.")
-        return
     try:
-        module_script = importlib.import_module(module_name)
-        # Pass stop_event to the bot loop so it can exit when signaled
-        module_script.run_game_loop(stop_event)
-    except Exception as e:
-        logging.error(f"Failed to run script for '{selected_game_mode}': {e}")
+        module = importlib.import_module(module_name)
+    except ImportError as e:
+        logging.error(f"Could not import module '{module_name}': {e}")
+        return
+    if hasattr(module, "run_game_loop"):
+        module.run_game_loop(stop_event)
+    elif hasattr(module, "main"):
+        module.main()
+    else:
+        logging.error(f"No entry point found for '{selected_game_mode}'.")
 
 # ===========================
 # LCU Event Listeners
@@ -84,18 +93,18 @@ async def on_gameflow_phase(connection, event):
     last_phase = phase
 
     # Create a lobby
-    if phase == "None":
+    if phase == GAMEFLOW_PHASES["NONE"]:
         selected_game_mode = get_selected_game_mode()
-        mode_info = SUPPORTED_MODES.get(selected_game_mode.lower())
+        mode_info = SUPPORTED_MODES.get(selected_game_mode)
         queue_id = mode_info.get("queue_id")
         try:
             await connection.request('post', '/lol-lobby/v2/lobby', data={"queueId": queue_id})
-            logging.info(f"{selected_game_mode.capitalize()} lobby created (queueId={queue_id}).")
+            logging.info(f"{selected_game_mode.capitalize()} lobby created.")
         except Exception as e:
             logging.error(f"Failed to create {selected_game_mode} lobby: {e}")
 
     # Start queue
-    if phase == "Lobby":
+    if phase == GAMEFLOW_PHASES["LOBBY"]:
         try:
             await connection.request('post', '/lol-lobby/v2/lobby/matchmaking/search')
             logging.info("[EVENT] Starting queue.")
@@ -103,7 +112,7 @@ async def on_gameflow_phase(connection, event):
             logging.error(f"Failed to start queue: {e}")
 
     # Accept ready check
-    if phase == "ReadyCheck":
+    if phase == GAMEFLOW_PHASES["READY_CHECK"]:
         try:
             await connection.request('post', '/lol-matchmaking/v1/ready-check/accept')
             logging.info("Accepted ready check.")
@@ -111,11 +120,11 @@ async def on_gameflow_phase(connection, event):
             logging.error(f"Failed to accept ready check: {e}")
 
     # Log champion select phase
-    if phase == "ChampionSelect":
+    if phase == GAMEFLOW_PHASES["CHAMP_SELECT"]:
         logging.info("[EVENT] In champion select.")
 
     # Start bot loop thread on game start
-    if phase == "GameStart":
+    if phase == GAMEFLOW_PHASES["GAME_START"]:
         logging.info("[EVENT] Game started.")
         game_end_event.clear()
         # Start the game loop thread if not already running
@@ -124,11 +133,11 @@ async def on_gameflow_phase(connection, event):
             game_loop_thread.start()
 
     # Log in-progress phase
-    if phase == "InProgress":
+    if phase == GAMEFLOW_PHASES["IN_PROGRESS"]:
         logging.info("[EVENT] Game in progress.")
 
     # Clean up bot thread and send play-again request on end of game
-    if phase == "EndOfGame":
+    if phase == GAMEFLOW_PHASES["END_OF_GAME"]:
         logging.info("[EVENT] Game ended.")
         game_end_event.set()
         if game_loop_thread is not None:
@@ -154,19 +163,27 @@ async def on_champ_select_session(connection, event):
     local_cell_id = session_data.get('localPlayerCellId')
 
     # Only pick during BAN_PICK subphase
-    if champ_phase == "BAN_PICK":
-        summoner = await connection.request('get', '/lol-summoner/v1/current-summoner')
-        summoner_to_json = await summoner.json()
-        summoner_id = summoner_to_json['summonerId']
+    if champ_phase == CHAMP_SELECT_SUBPHASES["BAN_PICK"]:
+        config = load_config()
+        preferred_champion = config.get("General", {}).get("preferred_champion", "").strip()
+        champions_map = get_champions_map()
 
-        champion_list = await connection.request('get', f'/lol-champions/v1/inventories/{summoner_id}/champions-minimal')
-        champion_list_to_json = await champion_list.json()
-        champions_map = {champion['name']: champion['id'] for champion in champion_list_to_json}
+        # Try to get the preferred champion ID
+        preferred_champ_id = champions_map.get(preferred_champion) if preferred_champion else None
 
         for action_group in actions:
             for action in action_group:
-                if action.get('actorCellId') == local_cell_id and action.get('type') == 'pick' and action.get('isInProgress'):
+                if action.get('actorCellId') == local_cell_id and action.get('type') == 'pick'  and action.get('isInProgress'):
                     action_id = action.get('id')
+                    # Attempt to pick preferred champion first
+                    if preferred_champion != "":
+                        preferred_champ_id = champions_map.get(preferred_champion)
+                        await connection.request(
+                            'patch',
+                            f'/lol-champ-select/v1/session/actions/{action_id}',
+                            data={"championId": preferred_champ_id, "completed": True}
+                        )
+                        await asyncio.sleep(0.5)
 
                     # Pick Bravery for arena
                     await connection.request(
@@ -176,11 +193,7 @@ async def on_champ_select_session(connection, event):
                     )
                     await asyncio.sleep(0.5)
 
-                    # Pick a random champion
-                    if not champions_map:
-                        logging.error("No champions found for your account.")
-                        return
-
+                    # Pick a random champion if preferred not set or failed
                     valid_champ_ids = [cid for cid in champions_map.values() if cid != -1]
                     champ_id = random.choice(valid_champ_ids)
                     await connection.request(
@@ -212,11 +225,12 @@ if __name__ == "__main__":
     threading.Thread(target=listen_for_exit_key, daemon=True).start()
     while True:
         selected_game_mode = get_selected_game_mode()
-        print("=== League Bot Launcher ===")
+        print("=== INTAI Menu ===")
         print("0. Exit")
         print("1. Run Script")
         print(f"2. Change gamemode from [{selected_game_mode}]")
         print("3. Change Settings")
+        print("4. Run tests")
         choice = input("Select an option: ").strip()
         if choice == "0":
             break
@@ -237,8 +251,12 @@ if __name__ == "__main__":
                 else:
                     logging.warning("Invalid selection. Please try again.")
             except ValueError:
-                logging.warning("Invalid input. Please try again.")
+                logging.warning("Invalid input. Please enter a number.")
         elif choice == "3":
             launch_keybind_gui()
+        elif choice == "4":
+            logging.info("Running tests...")
+            time.sleep(1)
+            run_game_loop(game_end_event)
         else:
             logging.warning("Invalid selection. Please try again.")

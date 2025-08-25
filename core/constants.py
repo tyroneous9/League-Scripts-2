@@ -4,6 +4,8 @@
 
 import win32api
 
+import core
+
 
 # ===========================
 # League General
@@ -39,13 +41,13 @@ ALLY_HEALTH_BAR_COLOR = (242, 189, 110)  # Blue
 
 
 # ===========================
-# League API
+# League APIs
 # ===========================
 
-# LiveClientData API URL
+# LiveClientData
 LIVE_CLIENT_URL = "https://127.0.0.1:2999/liveclientdata"
 
-# LCU Endpoints
+# LCU
 LCU_MATCHMAKING_READY_CHECK = "/lol-matchmaking/v1/ready-check"
 LCU_CHAMP_SELECT_SESSION = "/lol-champ-select/v1/session"
 LCU_GAMEFLOW_PHASE = "/lol-gameflow/v1/gameflow-phase"
@@ -64,6 +66,10 @@ GAMEFLOW_PHASES = {
 CHAMP_SELECT_SUBPHASES = {
     "BAN_PICK": "BAN_PICK"
 }
+
+# Data Dragon
+DATA_DRAGON_VERSIONS_URL = "https://ddragon.leagueoflegends.com/api/versions.json"
+DATA_DRAGON_DEFAULT_LOCALE = "en_US"
 
 
 # ===========================
@@ -92,5 +98,7 @@ SCREEN_CENTER = (screen_width // 2, screen_height // 2)
 
 # Tesseract OCR executable path
 TESSERACT_PATH = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+
 
 

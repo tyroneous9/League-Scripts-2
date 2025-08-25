@@ -1,0 +1,28 @@
+2025-08-24 21:57:32 [INFO] Press END key to exit anytime.
+2025-08-24 21:57:35 [INFO] Starting Script. Waiting for client...
+2025-08-24 21:57:35 [INFO] Connected to League Client, waiting for window...
+2025-08-24 21:58:41 [INFO] [EVENT] Game started.
+2025-08-24 21:58:41 [INFO] Bot has started.
+2025-08-24 21:58:41 [WARNING] No game data available.
+2025-08-24 21:58:42 [INFO] [EVENT] Game in progress.
+2025-08-24 21:58:42 [WARNING] No game data available.
+2025-08-24 21:58:43 [WARNING] No game data available.
+2025-08-24 21:58:44 [WARNING] No game data available.
+2025-08-24 21:58:45 [WARNING] No game data available.
+2025-08-24 21:58:45 [WARNING] No game data available.
+2025-08-24 21:58:46 [WARNING] No game data available.
+2025-08-24 21:58:47 [WARNING] No game data available.
+2025-08-24 21:58:48 [WARNING] No game data available.
+2025-08-24 21:58:49 [WARNING] No game data available.
+2025-08-24 21:58:50 [WARNING] No game data available.
+2025-08-24 21:58:51 [WARNING] No game data available.
+2025-08-24 21:58:52 [WARNING] No game data available.
+2025-08-24 21:58:53 [WARNING] No game data available.
+2025-08-24 21:58:58 [INFO] OCR: Text 'SELL' not found on screen.
+2025-08-24 21:59:00 [INFO] OCR: Text 'SELL' not found on screen.
+2025-08-24 21:59:00 [WARNING] Shop location could not be found after opening shop.
+2025-08-24 21:59:46 [INFO] OCR: Text 'SELL' not found on screen.
+2025-08-24 21:59:47 [INFO] OCR: Found text 'SELL' at location (610, 844, 36, 12)
+2025-08-24 21:59:51 [INFO] OCR: Text 'SELL' not found on screen.
+2025-08-24 21:59:52 [INFO] OCR: Found text 'SELL' at location (610, 844, 36, 12)
+2025-08-24 22:00:11 [INFO] END key pressed. Exiting program...
