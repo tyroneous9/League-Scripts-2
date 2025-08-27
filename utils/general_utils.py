@@ -172,10 +172,10 @@ def extract_screen_text():
     img_gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     _, img_thresh = cv2.threshold(img_gray, 70, 255, cv2.THRESH_BINARY)
     pil_img = Image.fromarray(img_thresh)
-    # cv2.imwrite("preprocessed_image.jpg", img_thresh) 
+    cv2.imwrite("preprocessed_image.jpg", img_thresh) 
 
     text = pytesseract.image_to_string(pil_img, config='--psm 11')
-    print(text)
+    logging.info(text)
     return text
 
 

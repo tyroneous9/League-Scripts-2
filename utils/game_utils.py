@@ -10,20 +10,6 @@ from utils.general_utils import click_percent, find_text_location, get_screensho
 
 
 # ===========================
-# Game Settings Utilities
-# ===========================
-
-def load_game_settings():
-    """
-    Loads keybinds and general settings for use in game utility functions.
-    Returns:
-        tuple: (keybinds dict, general settings dict)
-    """
-    keybinds, general = load_settings()
-    return keybinds, general
-
-
-# ===========================
 # Game Data Retrieval
 # ===========================
 
@@ -68,7 +54,7 @@ def find_champion_location(health_bar_bgr, health_tick_bgr, tolerance=2):
 # Game Control Utilities
 # ===========================
 
-_keybinds, _general = load_game_settings()
+_keybinds, _general = load_settings()
 
 def sleep_random(min_seconds, max_seconds):
     """
@@ -137,6 +123,7 @@ def move_to_ally(ally_number=1):
     Args:
         ally_number (int): The ally number to select (e.g., 1, 2, 3, 4).
     """
+
     ally_keys = {
         1: _keybinds.get("select_ally_1"),
         2: _keybinds.get("select_ally_2"),
@@ -144,8 +131,7 @@ def move_to_ally(ally_number=1):
         4: _keybinds.get("select_ally_4"),
     }
     ally_key = ally_keys.get(ally_number)
-    if ally_key:
-        keyboard.send(ally_key)
+    keyboard.send(ally_key)
     # Move randomly near ally
     offset_x = random.randint(-15, 15)  # percent offset
     offset_y = random.randint(-15, 15)  # percent offset
@@ -189,6 +175,20 @@ def move_random_offset(x, y, max_offset=15):
     offset_x = random.randint(-max_offset, max_offset)  # percent offset
     offset_y = random.randint(-max_offset, max_offset)  # percent offset
     click_percent(x, y, offset_x, offset_y, "right")
+
+
+def get_distance(coord1, coord2):
+    """
+    Calculates the Euclidean distance between two (x, y) coordinates.
+    Args:
+        coord1 (tuple): (x1, y1)
+        coord2 (tuple): (x2, y2)
+    Returns:
+        float: Distance between the two points.
+    """
+    x1, y1 = coord1
+    x2, y2 = coord2
+    return ((x2 - x1) ** 2 + (y2 - y1) ** 2) ** 0.5
 
 
 

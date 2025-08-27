@@ -166,6 +166,7 @@ imports:
  &#8226;   <a href="#operator">operator</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#posixpath">posixpath</a>
+ &#8226;   <a href="#pygetwindow">pygetwindow</a>
  &#8226;   <a href="#pyi_rth__tkinter.py">pyi_rth__tkinter.py</a>
  &#8226;   <a href="#pyi_rth_inspect.py">pyi_rth_inspect.py</a>
  &#8226;   <a href="#pyi_rth_multiprocessing.py">pyi_rth_multiprocessing.py</a>
@@ -189,6 +190,7 @@ imports:
  &#8226;   <a href="#utils.general_utils">utils.general_utils</a>
  &#8226;   <a href="#warnings">warnings</a>
  &#8226;   <a href="#weakref">weakref</a>
+ &#8226;   <a href="#win32con">win32con</a>
  &#8226;   <a href="#win32gui">win32gui</a>
 
   </div>
@@ -2682,6 +2684,7 @@ imported by:
 <span class="moduletype">MissingModule</span>  <div class="import">
 imported by:
     <a href="#keyboard._darwinkeyboard">keyboard._darwinkeyboard</a>
+ &#8226;   <a href="#pygetwindow._pygetwindow_macos">pygetwindow._pygetwindow_macos</a>
 
   </div>
 
@@ -8118,6 +8121,8 @@ imported by:
  &#8226;   <a href="#psutil._common">psutil._common</a>
  &#8226;   <a href="#psutil._pswindows">psutil._pswindows</a>
  &#8226;   <a href="#pydoc">pydoc</a>
+ &#8226;   <a href="#pygetwindow">pygetwindow</a>
+ &#8226;   <a href="#pyrect">pyrect</a>
  &#8226;   <a href="#queue">queue</a>
  &#8226;   <a href="#requests.compat">requests.compat</a>
  &#8226;   <a href="#requests.sessions">requests.sessions</a>
@@ -8572,8 +8577,10 @@ imports:
  &#8226;   <a href="#core.constants">core.constants</a>
  &#8226;   <a href="#keyboard">keyboard</a>
  &#8226;   <a href="#logging">logging</a>
+ &#8226;   <a href="#requests">requests</a>
  &#8226;   <a href="#threading">threading</a>
  &#8226;   <a href="#time">time</a>
+ &#8226;   <a href="#utils.config_utils">utils.config_utils</a>
  &#8226;   <a href="#utils.game_utils">utils.game_utils</a>
  &#8226;   <a href="#utils.general_utils">utils.general_utils</a>
 
@@ -8624,6 +8631,7 @@ imported by:
 imports:
     <a href="#_ctypes">_ctypes</a>
  &#8226;   <a href="#ctypes._endian">ctypes._endian</a>
+ &#8226;   <a href="#ctypes.wintypes">ctypes.wintypes</a>
  &#8226;   <a href="#nt">nt</a>
  &#8226;   <a href="#os">os</a>
  &#8226;   <a href="#struct">struct</a>
@@ -8648,6 +8656,7 @@ imported by:
  &#8226;   <a href="#numpy._core._internal">numpy._core._internal</a>
  &#8226;   <a href="#numpy.ctypeslib">numpy.ctypeslib</a>
  &#8226;   <a href="#psutil._common">psutil._common</a>
+ &#8226;   <a href="#pygetwindow._pygetwindow_win">pygetwindow._pygetwindow_win</a>
 
   </div>
 
@@ -8801,8 +8810,10 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#keyboard._winkeyboard">keyboard._winkeyboard</a>
+    <a href="#ctypes">ctypes</a>
+ &#8226;   <a href="#keyboard._winkeyboard">keyboard._winkeyboard</a>
  &#8226;   <a href="#mss.windows">mss.windows</a>
+ &#8226;   <a href="#pygetwindow._pygetwindow_win">pygetwindow._pygetwindow_win</a>
 
   </div>
 
@@ -9284,6 +9295,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#numpy.testing._private.utils">numpy.testing._private.utils</a>
+ &#8226;   <a href="#pyrect">pyrect</a>
 
   </div>
 
@@ -23742,6 +23754,63 @@ imported by:
 </div>
 
 <div class="node">
+  <a name="pygetwindow"></a>
+  <a target="code" href="///C:/Users/Wesley/AppData/Local/Programs/Python/Python311/Lib/site-packages/pygetwindow/__init__.py" type="text/plain"><tt>pygetwindow</tt></a>
+<span class="moduletype">Package</span>  <div class="import">
+imports:
+    <a href="#collections">collections</a>
+ &#8226;   <a href="#pygetwindow._pygetwindow_macos">pygetwindow._pygetwindow_macos</a>
+ &#8226;   <a href="#pygetwindow._pygetwindow_win">pygetwindow._pygetwindow_win</a>
+ &#8226;   <a href="#pyrect">pyrect</a>
+ &#8226;   <a href="#sys">sys</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#pygetwindow._pygetwindow_macos">pygetwindow._pygetwindow_macos</a>
+ &#8226;   <a href="#pygetwindow._pygetwindow_win">pygetwindow._pygetwindow_win</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="pygetwindow._pygetwindow_macos"></a>
+  <a target="code" href="///C:/Users/Wesley/AppData/Local/Programs/Python/Python311/Lib/site-packages/pygetwindow/_pygetwindow_macos.py" type="text/plain"><tt>pygetwindow._pygetwindow_macos</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#Quartz">Quartz</a>
+ &#8226;   <a href="#pygetwindow">pygetwindow</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#pygetwindow">pygetwindow</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="pygetwindow._pygetwindow_win"></a>
+  <a target="code" href="///C:/Users/Wesley/AppData/Local/Programs/Python/Python311/Lib/site-packages/pygetwindow/_pygetwindow_win.py" type="text/plain"><tt>pygetwindow._pygetwindow_win</tt></a>
+<span class="moduletype">SourceModule</span>  <div class="import">
+imports:
+    <a href="#ctypes">ctypes</a>
+ &#8226;   <a href="#ctypes.wintypes">ctypes.wintypes</a>
+ &#8226;   <a href="#pygetwindow">pygetwindow</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#pygetwindow">pygetwindow</a>
+
+  </div>
+
+</div>
+
+<div class="node">
   <a name="pyimod02_importers"></a>
   <a target="code" href="" type="text/plain"><tt>pyimod02_importers</tt></a>
 <span class="moduletype">MissingModule</span>  <div class="import">
@@ -23758,6 +23827,23 @@ imported by:
 <span class="moduletype">MissingModule</span>  <div class="import">
 imported by:
     <a href="#urllib3.contrib.emscripten.fetch">urllib3.contrib.emscripten.fetch</a>
+
+  </div>
+
+</div>
+
+<div class="node">
+  <a name="pyrect"></a>
+  <a target="code" href="///C:/Users/Wesley/AppData/Local/Programs/Python/Python311/Lib/site-packages/pyrect/__init__.py" type="text/plain"><tt>pyrect</tt></a>
+<span class="moduletype">Package</span>  <div class="import">
+imports:
+    <a href="#collections">collections</a>
+ &#8226;   <a href="#doctest">doctest</a>
+
+  </div>
+  <div class="import">
+imported by:
+    <a href="#pygetwindow">pygetwindow</a>
 
   </div>
 
@@ -24215,7 +24301,8 @@ imports:
   </div>
   <div class="import">
 imported by:
-    <a href="#requests">requests</a>
+    <a href="#core.run_arena">core.run_arena</a>
+ &#8226;   <a href="#requests">requests</a>
  &#8226;   <a href="#requests.__version__">requests.__version__</a>
  &#8226;   <a href="#requests._internal_utils">requests._internal_utils</a>
  &#8226;   <a href="#requests.adapters">requests.adapters</a>
@@ -25464,6 +25551,7 @@ imported by:
  &#8226;   <a href="#psutil._pswindows">psutil._pswindows</a>
  &#8226;   <a href="#py_compile">py_compile</a>
  &#8226;   <a href="#pydoc">pydoc</a>
+ &#8226;   <a href="#pygetwindow">pygetwindow</a>
  &#8226;   <a href="#pyi_rth__tkinter.py">pyi_rth__tkinter.py</a>
  &#8226;   <a href="#pyi_rth_inspect.py">pyi_rth_inspect.py</a>
  &#8226;   <a href="#pyi_rth_multiprocessing.py">pyi_rth_multiprocessing.py</a>
@@ -27836,6 +27924,7 @@ imports:
   <div class="import">
 imported by:
     <a href="#core.change_settings">core.change_settings</a>
+ &#8226;   <a href="#core.run_arena">core.run_arena</a>
  &#8226;   <a href="#main.py">main.py</a>
  &#8226;   <a href="#utils.game_utils">utils.game_utils</a>
 
@@ -28212,7 +28301,8 @@ imported by:
   <a target="code" href="///C:/Users/Wesley/AppData/Local/Programs/Python/Python311/Lib/site-packages/win32/lib/win32con.py" type="text/plain"><tt>win32con</tt></a>
 <span class="moduletype">SourceModule</span>  <div class="import">
 imported by:
-    <a href="#utils.general_utils">utils.general_utils</a>
+    <a href="#main.py">main.py</a>
+ &#8226;   <a href="#utils.general_utils">utils.general_utils</a>
 
   </div>
 

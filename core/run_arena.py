@@ -6,12 +6,15 @@ import time
 import threading
 import keyboard
 import logging
+
+import requests
 from core.constants import (
     HEALTH_TICK_COLOR, ENEMY_HEALTH_BAR_COLOR, SCREEN_CENTER
 )
-from utils.general_utils import click_percent, poll_live_client_data
+from utils.config_utils import load_settings
+from utils.general_utils import click_percent, poll_live_client_data, find_text_location
 from utils.game_utils import (
-    load_game_settings,
+    get_distance,
     move_random_offset,
     move_to_ally,
     find_champion_location,
@@ -21,11 +24,12 @@ from utils.game_utils import (
     sleep_random,
 )
 
+
 # ===========================
 # Initialization
 # ===========================
 
-_keybinds, _general = load_game_settings()
+_keybinds, _general = load_settings()
 _latest_game_data = {'data': None}
 
 
@@ -63,32 +67,37 @@ def combat_phase():
     if enemy_location:
         # Move to enemy
         click_percent(enemy_location[0], enemy_location[1], 0, 0, "right")
-        # Use spells and items
-        keyboard.send(_keybinds.get("spell_1"))
-        keyboard.send(_keybinds.get("spell_2"))
-        keyboard.send(_keybinds.get("spell_3"))
-        keyboard.send(_keybinds.get("spell_4"))
-        keyboard.send(_keybinds.get("item_1"))
-        keyboard.send(_keybinds.get("item_2"))
-        keyboard.send(_keybinds.get("item_3"))
-        keyboard.send(_keybinds.get("item_4"))
-        keyboard.send(_keybinds.get("item_5"))
-        keyboard.send(_keybinds.get("item_6"))
-        move_random_offset(*enemy_location, 15)
-        sleep_random(0.1, 0.3)
-        # Self preservation
-        if _latest_game_data['data']:
-            current_hp = _latest_game_data['data']["activePlayer"].get("championStats", {}).get("currentHealth")
-            max_hp = _latest_game_data['data']["activePlayer"].get("championStats", {}).get("maxHealth")
-            hp_percent = (current_hp / max_hp)
-            if hp_percent < .3:
-                retreat_to_ally()
-                if(hp_percent == 0):
-                    return
+        
+        # When within combat distance
+        distance_to_enemy = get_distance(SCREEN_CENTER, enemy_location)
+        if distance_to_enemy < 600:
+            keyboard.send(_keybinds.get("spell_4"))
+            keyboard.send(_keybinds.get("spell_1"))
+            keyboard.send(_keybinds.get("spell_2"))
+            keyboard.send(_keybinds.get("spell_3"))
+            keyboard.send(_keybinds.get("item_1"))
+            keyboard.send(_keybinds.get("item_2"))
+            keyboard.send(_keybinds.get("item_3"))
+            keyboard.send(_keybinds.get("item_4"))
+            keyboard.send(_keybinds.get("item_5"))
+            keyboard.send(_keybinds.get("item_6"))
+            sleep_random(0.1, 0.3)
+            move_random_offset(*enemy_location, 15)
+            sleep_random(0.1, 0.3)
+            # Self preservation
+            if _latest_game_data['data']:
+                current_hp = _latest_game_data['data']["activePlayer"].get("championStats", {}).get("currentHealth")
+                max_hp = _latest_game_data['data']["activePlayer"].get("championStats", {}).get("maxHealth")
+                if current_hp is not None and max_hp:
+                    hp_percent = (current_hp / max_hp)
+                    if hp_percent < .3:
+                        retreat_to_ally()
+                        if(hp_percent == 0):
+                            return
     else:
         # Move to ally
         move_to_ally(1)
-        sleep_random(0, 0.5)
+        sleep_random(0, 0.3)
 
 # ===========================
 # Main Bot Loop
@@ -110,14 +119,24 @@ def run_game_loop(stop_event):
     logging.info("Bot has started.")
 
     while not stop_event.is_set():
-
         if _latest_game_data['data']:
+            # Shop phase
             current_level = _latest_game_data['data']["activePlayer"].get("level")
-            if current_level > prev_level:
-                time.sleep(3)
+            if current_level is not None and current_level > prev_level:
+                time.sleep(2)
                 for _ in range(current_level - prev_level):
                     shop_phase()
-                prev_level = current_level if current_level else prev_level
+                prev_level = current_level
+                
+            # Exit game
+            current_hp = _latest_game_data['data']["activePlayer"].get("championStats", {}).get("currentHealth")
+            if current_hp == 0:
+                logging.info("Player is dead (currentHealth == 0).")
+                # OCR for "Exit" button and click it
+                exit_box = find_text_location("EXITNOW")
+                if exit_box:
+                    x, y, w, h = exit_box
+                    click_percent(x, y)
         else:
             logging.warning("No game data available.")
 

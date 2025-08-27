@@ -11,6 +11,7 @@ import core
 # League General
 # ===========================
 LEAGUE_CLIENT_WINDOW_TITLE = "League of Legends"
+LEAGUE_GAME_WINDOW_TITLE = "League of Legends (TM) Client"
 
 SUPPORTED_MODES = {
     "arena": {
@@ -44,6 +45,9 @@ ALLY_HEALTH_BAR_COLOR = (242, 189, 110)  # Blue
 # League APIs
 # ===========================
 
+# Default timeout for API calls (seconds)
+DEFAULT_API_TIMEOUT = 60
+
 # LiveClientData
 LIVE_CLIENT_URL = "https://127.0.0.1:2999/liveclientdata"
 
@@ -54,6 +58,8 @@ LCU_GAMEFLOW_PHASE = "/lol-gameflow/v1/gameflow-phase"
 LCU_SUMMONER = "/lol-summoner/v1/current-summoner"
 LCU_CHAMPIONS_MINIMAL = "/lol-champions/v1/inventories/{summoner_id}/champions-minimal"
 
+
+
 GAMEFLOW_PHASES = {
     "NONE": "None",
     "LOBBY": "Lobby",
@@ -61,6 +67,7 @@ GAMEFLOW_PHASES = {
     "CHAMP_SELECT": "ChampionSelect",
     "GAME_START": "GameStart",
     "IN_PROGRESS": "InProgress",
+    "PRE_END_OF_GAME": "PreEndOfGame",
     "END_OF_GAME": "EndOfGame",
 }
 CHAMP_SELECT_SUBPHASES = {
@@ -73,24 +80,13 @@ DATA_DRAGON_DEFAULT_LOCALE = "en_US"
 
 
 # ===========================
-# Timeouts and Delays
-# ===========================
-
-# Default timeout for API calls (seconds)
-DEFAULT_API_TIMEOUT = 1
-
-# Default key press delay for pywin32 input simulation (seconds)
-KEY_PRESS_DELAY = 0.05
-
-
-# ===========================
 # Screen Geometry
 # ===========================
 
 # Get screen dimensions using win32api
-screen_width = win32api.GetSystemMetrics(0)
-screen_height = win32api.GetSystemMetrics(1)
-SCREEN_CENTER = (screen_width // 2, screen_height // 2)
+SCREEN_WIDTH = win32api.GetSystemMetrics(0)
+SCREEN_HEIGHT = win32api.GetSystemMetrics(1)
+SCREEN_CENTER = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
 # ===========================
 # OCR Configuration
