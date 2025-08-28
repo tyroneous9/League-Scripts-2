@@ -29,14 +29,14 @@ def show_menu(run_script_callback):
 
     # --- MENU PAGE ---
     def run_script():
-        run_script_callback(testing=False)
         root.destroy()
+        run_script_callback(testing=False)
+        
 
     def run_tests():
+        root.destroy()
         logging.info("Running tests...")
         run_script_callback(testing=True)
-        messagebox.showinfo("Tests", "Tests started (see logs).")
-        refresh_menu()
 
     def change_gamemode():
         # Clear previous widgets in gamemode_frame

@@ -118,6 +118,7 @@ def run_game_loop(stop_event):
     logging.info("Bot has started.")
 
     while not stop_event.is_set():
+        logging.info("Running game loop...")
         if _latest_game_data['data']:
             # Shop phase
             current_level = _latest_game_data['data']["activePlayer"].get("level")

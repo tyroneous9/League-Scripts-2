@@ -228,6 +228,9 @@ def run_script(testing=False):
     if testing:
         # test logic here
         logging.info("Running tests...")
+        game_end_event.clear()
+        run_game_loop(game_end_event)
+
     else:
         logging.info("Starting Script. Waiting for client...")
         connector.start()
