@@ -3,14 +3,10 @@
 import asyncio
 import logging
 import threading
-import time
 import random
 import importlib
-import win32con
-import win32gui
-import pygetwindow as gw
 from utils.config_utils import (
-    disable_insecure_request_warning, get_selected_game_mode, set_selected_game_mode, load_config
+    disable_insecure_request_warning, get_selected_game_mode, load_config
 )
 from core.constants import (
     LEAGUE_GAME_WINDOW_TITLE,
@@ -21,9 +17,9 @@ from core.constants import (
     GAMEFLOW_PHASES,
     CHAMP_SELECT_SUBPHASES
 )
-from utils.general_utils import extract_screen_text, listen_for_exit_key, enable_logging, get_champions_map
-from core.change_settings import launch_keybind_gui
+from utils.general_utils import listen_for_exit_key, enable_logging, get_champions_map, wait_for_window
 from lcu_driver import Connector
+from core.menu import show_menu  
 
 connector = Connector()
 
@@ -46,17 +42,8 @@ async def connect(connection):
     Waits for the client window, then triggers the initial gameflow phase logic.
     """
 
-    # Make sure client window is available
-    hwnd = None
-    for _ in range(60):
-        hwnd = win32gui.FindWindow(None, LEAGUE_CLIENT_WINDOW_TITLE)
-        if hwnd:
-            break
-        logging.info("League client window not found, retrying...")
-        time.sleep(1)
-    if not hwnd:
-        logging.error("League client window not available. Aborting script.")
-        return
+    # Wait for the client window
+    wait_for_window(LEAGUE_CLIENT_WINDOW_TITLE)
     logging.info("Connected to League client.")
 
     # Check current gameflow phase and run the handler logic
@@ -115,17 +102,18 @@ async def on_gameflow_phase(connection, event):
     # Start bot loop thread on game start
     if phase == GAMEFLOW_PHASES["GAME_START"] or phase == GAMEFLOW_PHASES["IN_PROGRESS"]:
         logging.info("[EVENT] Game is in progress.")
-        game_end_event.clear()
-        await asyncio.sleep(5)  # Wait a bit for the game to load
-        # Start the game loop thread if not already running
-        if game_loop_thread is None or not game_loop_thread.is_alive():
-            game_loop_thread = threading.Thread(target=run_game_loop, args=(game_end_event,), daemon=True)
-            game_loop_thread.start()
 
-    # Clean up bot thread and send play-again request on end of game
+        # Wait for the game window
+        wait_for_window(LEAGUE_GAME_WINDOW_TITLE)
+
+        # Start the game loop thread unless already running
+        game_end_event.clear()
+        game_loop_thread = threading.Thread(target=run_game_loop, args=(game_end_event,), daemon=True)
+        game_loop_thread.start()
+
+    # Clean up bot thread and playagain on end of game
     if phase == GAMEFLOW_PHASES["END_OF_GAME"] or phase == GAMEFLOW_PHASES["PRE_END_OF_GAME"]:
         logging.info("[EVENT] Game ended.")
-        # await asyncio.sleep(2)
         game_end_event.set()
         if game_loop_thread is not None:
             game_loop_thread.join()
@@ -236,48 +224,13 @@ def run_game_loop(stop_event):
         logging.error(f"No entry point found for '{selected_game_mode}'.")
 
 
-def show_menu():
-    selected_game_mode = get_selected_game_mode()
-    print("=== INTAI Menu ===")
-    print("0. Exit")
-    print("1. Run Script")
-    print(f"2. Change gamemode from [{selected_game_mode}]")
-    print("3. Change Settings")
-    print("4. Run tests")
-    choice = input("Select an option: ").strip()
-    if choice == "0":
-        return
-    elif choice == "1":
+def run_script(testing=False):
+    if testing:
+        # test logic here
+        logging.info("Running tests...")
+    else:
         logging.info("Starting Script. Waiting for client...")
         connector.start()
-        return
-    elif choice == "2":
-        print("Available game modes:")
-        for idx, mode in enumerate(SUPPORTED_MODES.keys(), start=1):
-            print(f"{idx}. {mode}")
-        mode_choice = input("Select game mode: ").strip()
-        try:
-            mode_idx = int(mode_choice) - 1
-            mode_list = list(SUPPORTED_MODES.keys())
-            if 0 <= mode_idx < len(mode_list):
-                set_selected_game_mode(mode_list[mode_idx])
-                logging.info(f"Game mode set to '{mode_list[mode_idx]}'.")
-            else:
-                logging.warning("Invalid selection. Please try again.")
-        except ValueError:
-            logging.warning("Invalid input. Please enter a number.")
-        # Show menu again after changing gamemode
-        show_menu()
-    elif choice == "3":
-        launch_keybind_gui()
-        # Show menu again after changing settings
-        show_menu()
-    elif choice == "4":
-        logging.info("Running tests...")
-        time.sleep(2)
-    else:
-        logging.warning("Invalid selection. Please try again.")
-        show_menu()
 
 
 # ===========================
@@ -293,8 +246,10 @@ if __name__ == "__main__":
     disable_insecure_request_warning()
     enable_logging()
     threading.Thread(target=listen_for_exit_key, daemon=True).start()
-    show_menu()
-    
-    
+    show_menu(run_script)  # Launch the GUI menu and pass the connector
+
+
+
+
 
 

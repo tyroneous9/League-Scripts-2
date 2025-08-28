@@ -129,6 +129,21 @@ def click_percent(x, y, x_offset_percent=0, y_offset_percent=0, button="left"):
     else:
         print(f"[WARN] Unknown mouse button: {button}. Use 'left' or 'right'.")
 
+
+def click_on_cursor(button="left"):
+    """
+    Simulates a mouse click at the current cursor position.
+    """
+    x, y = win32api.GetCursorPos()
+    if button == "left":
+        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, x, y, 0, 0)
+    elif button == "right":
+        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, x, y, 0, 0)
+    else:
+        print(f"[WARN] Unknown mouse button: {button}. Use 'left' or 'right'.")
+    win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, x, y, 0, 0)
+
+
 # Listen for the END key to terminate the bot
 def listen_for_exit_key():
     """
@@ -252,3 +267,38 @@ def enable_logging(log_file=None, level=logging.INFO):
             logging.StreamHandler()
         ]
     )
+
+
+def bring_window_to_front(window_title):
+    """
+    Finds the window by title and brings it to the foreground.
+    Args:
+        window_title (str): The title of the window.
+    """
+    hwnd = win32gui.FindWindow(None, window_title)
+    if hwnd:
+        win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+        time.sleep(0.1)
+        win32gui.SetForegroundWindow(hwnd)
+    else:
+        logging.warning(f"Window with title '{window_title}' not found.")
+
+def wait_for_window(window_title, timeout=60):
+    """
+    Waits for a window with the given title to appear within the timeout period.
+    If found, brings it to the foreground.
+    Args:
+        window_title (str): The title of the window to wait for.
+        timeout (int): Maximum time to wait in seconds.
+    Returns:
+        int or None: Window handle if found, else None.
+    """
+    hwnd = None
+    for _ in range(timeout):
+        hwnd = win32gui.FindWindow(None, window_title)
+        if hwnd:
+            bring_window_to_front(window_title)
+            return hwnd
+        time.sleep(1)
+    logging.warning(f"Window with title '{window_title}' not found after {timeout} seconds.")
+    return

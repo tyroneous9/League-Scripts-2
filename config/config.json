@@ -22,7 +22,7 @@
         "sum_2": "f"
     },
     "General": {
-        "selected_game_mode": "Arena",
+        "selected_game_mode": "arena",
         "preferred_champion": "Lee Sin"
     }
 }

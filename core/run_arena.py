@@ -7,12 +7,11 @@ import threading
 import keyboard
 import logging
 
-import requests
 from core.constants import (
     HEALTH_TICK_COLOR, ENEMY_HEALTH_BAR_COLOR, SCREEN_CENTER
 )
 from utils.config_utils import load_settings
-from utils.general_utils import click_percent, poll_live_client_data, find_text_location
+from utils.general_utils import click_on_cursor, click_percent, poll_live_client_data, find_text_location
 from utils.game_utils import (
     get_distance,
     move_random_offset,
@@ -67,7 +66,7 @@ def combat_phase():
     if enemy_location:
         # Move to enemy
         click_percent(enemy_location[0], enemy_location[1], 0, 0, "right")
-        
+    
         # When within combat distance
         distance_to_enemy = get_distance(SCREEN_CENTER, enemy_location)
         if distance_to_enemy < 600:
@@ -123,7 +122,7 @@ def run_game_loop(stop_event):
             # Shop phase
             current_level = _latest_game_data['data']["activePlayer"].get("level")
             if current_level is not None and current_level > prev_level:
-                time.sleep(2)
+                time.sleep(3)
                 for _ in range(current_level - prev_level):
                     shop_phase()
                 prev_level = current_level
@@ -131,9 +130,11 @@ def run_game_loop(stop_event):
             # Exit game
             current_hp = _latest_game_data['data']["activePlayer"].get("championStats", {}).get("currentHealth")
             if current_hp == 0:
-                logging.info("Player is dead (currentHealth == 0).")
+                logging.info("Player is dead (currentHealth == 0) .")
                 # OCR for "Exit" button and click it
                 exit_box = find_text_location("EXITNOW")
+                if not exit_box: 
+                    exit_box = find_text_location("EXIT")
                 if exit_box:
                     x, y, w, h = exit_box
                     click_percent(x, y)
