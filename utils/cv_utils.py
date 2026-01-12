@@ -50,6 +50,120 @@ def save_color_mask(img, color_bgr, tolerance=0):
     return out_path
 
 
+def save_grayscale_mask(img, threshold=128):
+    """Convert an image to grayscale, apply a binary threshold, and save to temp/.
+
+    Args:
+        img (np.ndarray): BGR image.
+        threshold (int): 0-255 threshold value for binary thresholding.
+
+    Returns:
+        str: full path to written mask image.
+    """
+    if img is None:
+        raise ValueError("img is required for save_grayscale_mask")
+    out_dir = os.path.join("temp")
+    filename = "grayscale_mask.png"
+    # convert to grayscale
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    # apply binary threshold
+    _, bin_img = cv2.threshold(gray, int(threshold), 255, cv2.THRESH_BINARY)
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, filename)
+    cv2.imwrite(out_path, bin_img)
+    return out_path
+
+
+def save_blurred_image(img, blur_amount=5):
+    """Save a blurred version of an image to temp/.
+
+    Args:
+        img (np.ndarray): BGR image.
+        blur_amount (int or tuple): If int, Gaussian kernel width/height (will be made odd).
+                                   If tuple, interpreted as (kw, kh) kernel sizes.
+
+    Returns:
+        str: full path to written blurred image.
+    """
+    if img is None:
+        raise ValueError("img is required for save_blurred_image")
+    out_dir = os.path.join("temp")
+    filename = "blurred.png"
+
+    # Determine kernel size and ensure odd positive integers
+    if isinstance(blur_amount, tuple):
+        kw = max(1, int(blur_amount[0]))
+        kh = max(1, int(blur_amount[1]))
+        if kw % 2 == 0:
+            kw += 1
+        if kh % 2 == 0:
+            kh += 1
+        ksize = (kw, kh)
+    else:
+        k = max(1, int(blur_amount))
+        if k % 2 == 0:
+            k += 1
+        ksize = (k, k)
+
+    blurred = cv2.GaussianBlur(img, ksize, 0)
+    os.makedirs(out_dir, exist_ok=True)
+    out_path = os.path.join(out_dir, filename)
+    cv2.imwrite(out_path, blurred)
+    return out_path
+
+
+def get_grayscale(img: np.ndarray) -> np.ndarray:
+    """Return a grayscale copy of `img`.
+
+    Works for BGR or already-grayscale images.
+    """
+    if len(img.shape) == 2:
+        return img.copy()
+    return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+
+def save_grayscale(img: np.ndarray, out_path: str) -> str:
+    """Save a grayscale version of `img` to `out_path` and return the path."""
+    gray = get_grayscale(img)
+    out_dir = os.path.dirname(out_path) or "."
+    os.makedirs(out_dir, exist_ok=True)
+    cv2.imwrite(out_path, gray)
+    return out_path
+
+
+def get_blurred(img: np.ndarray, blur_amount=5) -> np.ndarray:
+    """Return a blurred copy of `img` using a Gaussian kernel.
+
+    `blur_amount` may be an int (kernel) or a tuple (kw, kh). Kernel sizes are coerced to odd >=1.
+    """
+    if img is None:
+        raise ValueError("img is required for get_blurred")
+    # Determine kernel size and ensure odd positive integers
+    if isinstance(blur_amount, tuple):
+        kw = max(1, int(blur_amount[0]))
+        kh = max(1, int(blur_amount[1]))
+        if kw % 2 == 0:
+            kw += 1
+        if kh % 2 == 0:
+            kh += 1
+        ksize = (kw, kh)
+    else:
+        k = max(1, int(blur_amount))
+        if k % 2 == 0:
+            k += 1
+        ksize = (k, k)
+    return cv2.GaussianBlur(img, ksize, 0)
+
+
+def save_blurred(img: np.ndarray, out_path: str, blur_amount=5) -> str:
+    """Apply Gaussian blur to `img` and save to `out_path`. Returns the path."""
+    blurred = get_blurred(img, blur_amount)
+    out_dir = os.path.dirname(out_path) or "."
+    os.makedirs(out_dir, exist_ok=True)
+    cv2.imwrite(out_path, blurred)
+    return out_path
+
+
 def _find_adjacent_colors(
     img,
     bgr_1,
