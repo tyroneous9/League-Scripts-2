@@ -4,11 +4,10 @@ import random
 import time
 
 from lcu_driver import Connector
-
 from utils.config_utils import get_selected_game_mode, load_config, parse_lcu_input_settings, save_parsed_keybinds
-import inspect
 from utils.general_utils import bring_window_to_front, wait_for_window
 from utils.game_utils import get_champions_map
+from utils.cv_utils import load_template_cache
 from core.constants import (
     LEAGUE_GAME_WINDOW_TITLE,
     SUPPORTED_MODES,
@@ -36,7 +35,6 @@ class LCUManager:
 
     def _register_handlers(self):
         # Register handlers that respect the `handlers_can_run` event themselves.
-
         async def _connect(connection):
             await self.handlers_can_run.wait()
             await self._on_connect(connection)
@@ -68,6 +66,9 @@ class LCUManager:
         self.connector.loop = asyncio.get_running_loop()
         bring_window_to_front(LEAGUE_CLIENT_WINDOW_TITLE)
         logging.info("Connected to League client.")
+
+        # Preload templates
+        load_template_cache()
 
         # Try to fetch input settings from LCU and save parsed keybinds
         try:

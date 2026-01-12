@@ -1,10 +1,7 @@
 import json
 import os
-import urllib3
 import re
-
-CONFIG_DIR = os.path.join(os.path.dirname(__file__), "..", "config")
-CONFIG_PATH = os.path.join(CONFIG_DIR, "config.json")
+from core.constants import CONFIG_DIR, CONFIG_PATH
 
 def load_config(path=CONFIG_PATH):
     if not os.path.exists(path):

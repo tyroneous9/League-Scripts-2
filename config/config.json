@@ -114,10 +114,10 @@
         ],
         "evtChampionOnly": [
             {
-                "type": "mouse",
-                "mouse": "middle",
+                "type": "key",
+                "key": "v",
                 "modifiers": [],
-                "raw": "[Button 3]"
+                "raw": "[v]"
             }
         ],
         "evtChatHistory": [
@@ -129,7 +129,14 @@
             }
         ],
         "evtDragScrollLock": [],
-        "evtDrawHud": [],
+        "evtDrawHud": [
+            {
+                "type": "key",
+                "key": "h",
+                "modifiers": [],
+                "raw": "[h]"
+            }
+        ],
         "evtEmoteDance": [
             {
                 "type": "key",
@@ -233,7 +240,14 @@
         "evtNormalCastSpell3": [],
         "evtNormalCastSpell4": [],
         "evtNormalCastVisionItem": [],
-        "evtOnUIMouse4Pan": [],
+        "evtOnUIMouse4Pan": [
+            {
+                "type": "mouse",
+                "mouse": "middle",
+                "modifiers": [],
+                "raw": "[Button 3]"
+            }
+        ],
         "evtOpenShop": [
             {
                 "type": "key",
@@ -255,7 +269,7 @@
                 "modifiers": [
                     "alt"
                 ],
-                "raw": "[Alt][Button 2]"
+                "raw": "[Alt] [Button 2]"
             },
             {
                 "type": "mouse",
@@ -263,10 +277,16 @@
                 "modifiers": [
                     "ctrl"
                 ],
-                "raw": "[Ctrl][Button 2]"
+                "raw": "[Ctrl] [Button 2]"
             }
         ],
         "evtPlayerAttackMove": [
+            {
+                "type": "key",
+                "key": "u",
+                "modifiers": [],
+                "raw": "[u]"
+            },
             {
                 "type": "key",
                 "key": "x",
@@ -286,9 +306,9 @@
         "evtPlayerHoldPosition": [
             {
                 "type": "key",
-                "key": "h",
+                "key": "j",
                 "modifiers": [],
-                "raw": "[h]"
+                "raw": "[j]"
             }
         ],
         "evtPlayerMoveClick": [
@@ -341,14 +361,7 @@
                 "raw": "[i]"
             }
         ],
-        "evtReciprocityTrigger": [
-            {
-                "type": "key",
-                "key": "u",
-                "modifiers": [],
-                "raw": "[u]"
-            }
-        ],
+        "evtReciprocityTrigger": [],
         "evtScrollDown": [
             {
                 "type": "key",
@@ -799,7 +812,7 @@
                 "modifiers": [
                     "ctrl"
                 ],
-                "raw": "[Ctrl][f]"
+                "raw": "[Ctrl] [f]"
             }
         ],
         "evtToggleMouseClip": [
@@ -840,7 +853,7 @@
                 "modifiers": [
                     "ctrl"
                 ],
-                "raw": "[Ctrl][l]"
+                "raw": "[Ctrl] [l]"
             },
             {
                 "type": "key",
@@ -848,7 +861,7 @@
                 "modifiers": [
                     "ctrl"
                 ],
-                "raw": "[Ctrl][Return]"
+                "raw": "[Ctrl] [Return]"
             }
         ],
         "evtShopSwitchTabs": [
@@ -858,7 +871,7 @@
                 "modifiers": [
                     "ctrl"
                 ],
-                "raw": "[Ctrl][Tab]"
+                "raw": "[Ctrl] [TAB]"
             }
         ]
     }

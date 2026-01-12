@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('config/config.json', 'config')],
+    datas=[('config/config.json', 'config'), ('templates', 'templates')],
     hiddenimports=['core.run_arena', 'core.run_aram', 'core.run_test', 'core.run_yuumi_sr'],
     hookspath=[],
     hooksconfig={},

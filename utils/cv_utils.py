@@ -1,11 +1,14 @@
 import numpy as np
 import cv2
 import os
-from core.constants import ALLY_HEALTH_RIGHT_COLOR, ARENA_EXIT_LOWER_COLOR, ARENA_EXIT_UPPER_COLOR, ATTACHED_ALLY_LEFT_COLOR, ATTACHED_ALLY_LEFT_COLOR, ATTACHED_ALLY_RIGHT_COLOR, AUGMENT_LOWER_COLOR, AUGMENT_UPPER_COLOR, ENEMY_HEALTH_RIGHT_COLOR, HEALTH_LEFT_COLOR, PLAYER_HEALTH_RIGHT_COLOR, SHOP_LOWER_COLOR, SHOP_UPPER_COLOR, THRESHHOLD
+import json
+from pathlib import Path
+from typing import Dict, Optional
+from core.constants import ALLY_HEALTH_RIGHT_COLOR, ARENA_EXIT_LOWER_COLOR, ARENA_EXIT_UPPER_COLOR, ATTACHED_ALLY_LEFT_COLOR, ATTACHED_ALLY_LEFT_COLOR, ATTACHED_ALLY_RIGHT_COLOR, AUGMENT_LOWER_COLOR, AUGMENT_UPPER_COLOR, ENEMY_HEALTH_RIGHT_COLOR, HEALTH_LEFT_COLOR, PLAYER_HEALTH_RIGHT_COLOR, SHOP_LOWER_COLOR, SHOP_UPPER_COLOR, TEMPLATES_INDEX_PATH, THRESHHOLD, SCREEN_WIDTH, SCREEN_HEIGHT, TEMPLATES_DIR
 
 
 # ===========================
-# Screen Search Utilities
+# Basic Utils
 # ===========================
 
 
@@ -27,7 +30,7 @@ def get_color_mask(img, color_bgr, tolerance=0):
     return cv2.inRange(img, lower, upper)
 
 
-def save_color_mask(img, color_bgr, tolerance=0):
+def save_color_mask(img, color_bgr, tolerance=0, out_path: Optional[str] = None):
     """Compute a color mask and save it to disk.
 
     Args:
@@ -38,78 +41,8 @@ def save_color_mask(img, color_bgr, tolerance=0):
     Returns:
         str: full path to written mask image.
     """
-    if img is None:
-        raise ValueError("img is required for save_color_mask")
-    out_dir = os.path.join("temp")
-    filename = "color_mask.png"
     mask = get_color_mask(img, color_bgr, tolerance=tolerance)
-    os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, filename)
-    # write mask (single-channel) as PNG
-    cv2.imwrite(out_path, mask)
-    return out_path
-
-
-def save_grayscale_mask(img, threshold=128):
-    """Convert an image to grayscale, apply a binary threshold, and save to temp/.
-
-    Args:
-        img (np.ndarray): BGR image.
-        threshold (int): 0-255 threshold value for binary thresholding.
-
-    Returns:
-        str: full path to written mask image.
-    """
-    if img is None:
-        raise ValueError("img is required for save_grayscale_mask")
-    out_dir = os.path.join("temp")
-    filename = "grayscale_mask.png"
-    # convert to grayscale
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    # apply binary threshold
-    _, bin_img = cv2.threshold(gray, int(threshold), 255, cv2.THRESH_BINARY)
-    os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, filename)
-    cv2.imwrite(out_path, bin_img)
-    return out_path
-
-
-def save_blurred_image(img, blur_amount=5):
-    """Save a blurred version of an image to temp/.
-
-    Args:
-        img (np.ndarray): BGR image.
-        blur_amount (int or tuple): If int, Gaussian kernel width/height (will be made odd).
-                                   If tuple, interpreted as (kw, kh) kernel sizes.
-
-    Returns:
-        str: full path to written blurred image.
-    """
-    if img is None:
-        raise ValueError("img is required for save_blurred_image")
-    out_dir = os.path.join("temp")
-    filename = "blurred.png"
-
-    # Determine kernel size and ensure odd positive integers
-    if isinstance(blur_amount, tuple):
-        kw = max(1, int(blur_amount[0]))
-        kh = max(1, int(blur_amount[1]))
-        if kw % 2 == 0:
-            kw += 1
-        if kh % 2 == 0:
-            kh += 1
-        ksize = (kw, kh)
-    else:
-        k = max(1, int(blur_amount))
-        if k % 2 == 0:
-            k += 1
-        ksize = (k, k)
-
-    blurred = cv2.GaussianBlur(img, ksize, 0)
-    os.makedirs(out_dir, exist_ok=True)
-    out_path = os.path.join(out_dir, filename)
-    cv2.imwrite(out_path, blurred)
-    return out_path
+    return save_image(mask, out_path)
 
 
 def get_grayscale(img: np.ndarray) -> np.ndarray:
@@ -118,55 +51,167 @@ def get_grayscale(img: np.ndarray) -> np.ndarray:
     Works for BGR or already-grayscale images.
     """
     if len(img.shape) == 2:
-        return img.copy()
+        return img
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
 
-def save_grayscale(img: np.ndarray, out_path: str) -> str:
-    """Save a grayscale version of `img` to `out_path` and return the path."""
-    gray = get_grayscale(img)
-    out_dir = os.path.dirname(out_path) or "."
-    os.makedirs(out_dir, exist_ok=True)
-    cv2.imwrite(out_path, gray)
-    return out_path
+def save_grayscale(img: np.ndarray, out_path: Optional[str] = None) -> str:
+    """Save a grayscale version of `img` to `out_path` and return the path.
 
-
-def get_blurred(img: np.ndarray, blur_amount=5) -> np.ndarray:
-    """Return a blurred copy of `img` using a Gaussian kernel.
-
-    `blur_amount` may be an int (kernel) or a tuple (kw, kh). Kernel sizes are coerced to odd >=1.
+    If `out_path` is None the image will be written to `temp/temp_img.png`.
     """
-    if img is None:
-        raise ValueError("img is required for get_blurred")
-    # Determine kernel size and ensure odd positive integers
-    if isinstance(blur_amount, tuple):
-        kw = max(1, int(blur_amount[0]))
-        kh = max(1, int(blur_amount[1]))
-        if kw % 2 == 0:
-            kw += 1
-        if kh % 2 == 0:
-            kh += 1
-        ksize = (kw, kh)
-    else:
-        k = max(1, int(blur_amount))
-        if k % 2 == 0:
-            k += 1
-        ksize = (k, k)
+    gray = get_grayscale(img)
+    return save_image(gray, out_path)
+
+
+def get_blurred(img: np.ndarray, blur_amount=3) -> np.ndarray:
+    """Return a blurred copy of `img` using a Gaussian kernel.
+    """
+    k = max(1, int(blur_amount)) | 1
+    ksize = (k, k)
     return cv2.GaussianBlur(img, ksize, 0)
 
 
-def save_blurred(img: np.ndarray, out_path: str, blur_amount=5) -> str:
-    """Apply Gaussian blur to `img` and save to `out_path`. Returns the path."""
-    blurred = get_blurred(img, blur_amount)
+def save_blurred(img: np.ndarray, out_path: Optional[str] = None, blur_amount=5) -> str:
+    """Apply Gaussian blur to `img` and save to `out_path`. Returns the path.
+
+    If `out_path` is None the image will be written to `temp/temp_img.png`.
+    """
+    blurred = get_blurred(img, blur_amount=blur_amount)
+    return save_image(blurred, out_path)
+
+
+def save_image(img: np.ndarray, out_path: Optional[str] = None) -> str:
+    """Save `img` to `out_path` and return the full path.
+
+    If `out_path` is not provided, saves to `temp/temp_img.png`.
+    """
+    if out_path is None:
+        out_dir = os.path.join("temp")
+        out_path = os.path.join(out_dir, "temp_img.png")
     out_dir = os.path.dirname(out_path) or "."
     os.makedirs(out_dir, exist_ok=True)
-    cv2.imwrite(out_path, blurred)
+    # Use cv2.imwrite which handles single-channel or multi-channel images.
+    success = cv2.imwrite(out_path, img)
+    if not success:
+        raise IOError(f"Failed to write image to {out_path}")
     return out_path
 
 
+# -------------------------
+# Pattern matching utils
+# -------------------------
+
+# Caches MUST be loaded before use of template matching functions
+_INDEX_CACHE: Dict[str, Dict[str, Dict]] = {}
+_INDEX_LOADED: bool = False
+_TEMPLATE_IMAGE_CACHE: Dict[str, np.ndarray] = {}
+
+
+def load_index() -> Dict[str, Dict[str, Dict]]:
+    """
+    Return the in-memory index cache.
+    """
+    global _INDEX_CACHE, _INDEX_LOADED
+    if not _INDEX_LOADED:
+        raise RuntimeError("Templates index not loaded. Call load_template_cache() at startup.")
+    return _INDEX_CACHE
+
+
+def load_template_image(entry: Dict) -> Optional[np.ndarray]:
+    """Load the template image from cache or disk.
+    """
+    base_dir = Path(TEMPLATES_DIR)
+    path = base_dir / entry.get("path")
+    key = str(path)
+    img = _TEMPLATE_IMAGE_CACHE[key]
+    return img
+
+
+def load_template_cache() -> None:
+    """Cache loader: read index and preload grayscale templates.
+    """
+    global _INDEX_CACHE, _INDEX_LOADED, _TEMPLATE_IMAGE_CACHE
+
+    with TEMPLATES_INDEX_PATH.open("r", encoding="utf-8") as fh:
+        full_idx = json.load(fh)
+
+    resolution_key = f"{SCREEN_WIDTH}x{SCREEN_HEIGHT}"
+    entries = full_idx[resolution_key]
+
+    _INDEX_CACHE = {resolution_key: entries}
+    _TEMPLATE_IMAGE_CACHE.clear()
+
+    base_dir = Path(TEMPLATES_DIR)
+    for tid, entry in entries.items():
+        rel = entry.get("path")
+        tpl_path = base_dir / rel
+        key = str(tpl_path)
+        # Read original raw template (no preprocessing)
+        img_orig = cv2.imread(str(tpl_path), cv2.IMREAD_UNCHANGED)
+        if img_orig is None:
+            raise IOError(f"Failed to read template image for id {tid!r}: {tpl_path}")
+        # Apply preprocessing before loading to cache
+        img_gray = get_grayscale(img_orig)
+        blur_amount = int(entry.get("blur"))
+        img_proc = get_blurred(img_gray, blur_amount=blur_amount)
+        _TEMPLATE_IMAGE_CACHE[key] = img_proc
+
+    _INDEX_LOADED = True
+
+
+def clear_template_cache() -> None:
+    """Clear in-memory template and index caches."""
+    global _INDEX_CACHE, _INDEX_LOADED, _TEMPLATE_IMAGE_CACHE
+    _INDEX_CACHE.clear()
+    _INDEX_LOADED = False
+    _TEMPLATE_IMAGE_CACHE.clear()
+
+
+# Primary template matching function
+def find_template_match(
+    img: np.ndarray,
+    id: str,
+    threshold: float = 0.98,
+):
+    """Find the best matching template using a pyramid coarse-to-fine search.
+    Args:
+        img (np.ndarray): BGR image to search.
+        id (str): template id to search for.
+        threshold (float): minimum matching score to consider a valid match.
+    Returns:
+        tuple: (x, y) location of top-left corner of the first match, or None
+    """
+    assert img is not None, "caller must provide a valid image"
+    index = load_index()
+    resolution_key = f"{SCREEN_WIDTH}x{SCREEN_HEIGHT}"
+    if resolution_key not in index:
+        raise ValueError(f"Templates index does not contain resolution {resolution_key}")
+    entries_by_id = index[resolution_key]
+    if id not in entries_by_id:
+        raise ValueError(f"Template id {id!r} not found for resolution {resolution_key}")
+    entry = entries_by_id[id]
+    
+    img_gray_full = get_grayscale(img)
+    blur_amount = int(entry.get("blur"))
+    img_preproc = get_blurred(img_gray_full, blur_amount=blur_amount)
+
+    tpl = load_template_image(entry)
+    if tpl is None:
+        raise FileNotFoundError(f"Template image for id {id!r} not found at path {entry.get('path')}")
+    
+    res = cv2.matchTemplate(img_preproc, tpl, cv2.TM_CCOEFF_NORMED)
+    _, max_val, _, max_loc = cv2.minMaxLoc(res)
+    score = float(max_val)
+    if score >= threshold:
+        return (int(max_loc[0]), int(max_loc[1]))
+    return None
+
+
+# Color adjacency pattern matching function 
 def _find_adjacent_colors(
     img,
-    bgr_1,
+    bgr_1,      
     bgr_2,
     bgr_1_tolerance=0,
     bgr_2_tolerance=0,
@@ -174,7 +219,7 @@ def _find_adjacent_colors(
     shift_axis='x'
 ):
     """
-    Find all adjacent color pairs
+    Find all adjacent color pairs of a certain length.
     Args:
         img (np.ndarray): BGR image to search.
         bgr_1: BGR color on the adjacent left or top side, depending on shift_axis.
@@ -240,6 +285,10 @@ def _find_adjacent_colors(
     return uniq
 
 
+# -------------------------
+# Image Locators
+# -------------------------
+
 def find_ally_locations(img):
     """
     Finds the location of an ally champion by using ally health bar and border colors.
@@ -252,6 +301,7 @@ def find_ally_locations(img):
     if not locations:
         return []
     return [(x + 50, y + 160) for (x, y) in locations]
+
 
 def find_enemy_locations(img):
     """
@@ -303,7 +353,7 @@ def find_augment_location(img):
     Returns:
         list of (x,y) coordinates
     """
-    locations = _find_adjacent_colors(img, AUGMENT_UPPER_COLOR, AUGMENT_LOWER_COLOR, bgr_1_tolerance=3, bgr_2_tolerance=3, run_length=1, shift_axis='y')
+    locations = _find_adjacent_colors(img, AUGMENT_UPPER_COLOR, AUGMENT_LOWER_COLOR, bgr_1_tolerance=3, bgr_2_tolerance=3, run_length=4, shift_axis='y')
     if not locations:
         return []
     first_location = locations[0]
@@ -316,7 +366,7 @@ def find_shop_location(img):
     Returns:
         list of (x,y) coordinates
     """
-    locations = _find_adjacent_colors(img, SHOP_UPPER_COLOR, SHOP_LOWER_COLOR, bgr_1_tolerance=2, bgr_2_tolerance=5, run_length=1, shift_axis='y')
+    locations = _find_adjacent_colors(img, SHOP_UPPER_COLOR, SHOP_LOWER_COLOR, bgr_1_tolerance=2, bgr_2_tolerance=5, run_length=4, shift_axis='y')
     if not locations:
         return []
     first_location = locations[0]
@@ -329,8 +379,38 @@ def find_arena_exit_location(img):
     Returns:
         list of (x,y) coordinates
     """
-    locations = _find_adjacent_colors(img, ARENA_EXIT_UPPER_COLOR, ARENA_EXIT_LOWER_COLOR, bgr_1_tolerance=1, bgr_2_tolerance=0, run_length=1, shift_axis='y')
+    locations = _find_adjacent_colors(img, ARENA_EXIT_UPPER_COLOR, ARENA_EXIT_LOWER_COLOR, bgr_1_tolerance=1, bgr_2_tolerance=0, run_length=4, shift_axis='y')
     if not locations:
         return []
     first_location = locations[0]
     return (first_location[0], first_location[1])
+
+
+def find_shop_location_template(img):
+    """Locate the `sell_btn` using template matching and return its center (x, y) in the image.
+    """
+    loc = find_template_match(img, id="sell_btn", threshold=0.95)
+    if loc is None:
+        return None
+    x, y = loc
+    return (int(x), int(y))
+
+
+def find_augment_location_template(img):
+    """Locate the `toggle_augments_btn` using template matching and return its center (x, y) in the image.
+    """
+    loc = find_template_match(img, id="toggle_augments_btn", threshold=0.98)
+    if loc is None:
+        return None
+    x, y = loc
+    return (int(x), int(y) - 400)
+
+
+def find_arena_exit_location_template(img):
+    """Locate the `arena_exit_btn` using template matching and return its center (x, y) in the image.
+    """
+    loc = find_template_match(img, id="arena_exit_btn", threshold=0.95)
+    if loc is None:
+        return None
+    x, y = loc
+    return (int(x), int(y))

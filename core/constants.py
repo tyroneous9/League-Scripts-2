@@ -4,6 +4,8 @@
 
 import win32api
 import os
+import sys
+from pathlib import Path
 
 
 # ===========================
@@ -103,6 +105,7 @@ SCREEN_WIDTH = win32api.GetSystemMetrics(0)
 SCREEN_HEIGHT = win32api.GetSystemMetrics(1)
 SCREEN_CENTER = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
+
 # Parameters for the hybrid pixel->game units predictor (kept as constants for stability)
 GAME_DISTANCE_PARAMS = {
     "unit_scale": 1.1272789362463531,
@@ -113,6 +116,26 @@ GAME_DISTANCE_PARAMS = {
     "max_sep_mult": 1.3276067468392727,
     "pos_multiplier_min": 0.15,
 }
+
+# ===========================
+# Paths
+# ===========================
+
+
+# Templates
+
+if getattr(sys, "frozen", False) and getattr(sys, "_MEIPASS", None):
+    TEMPLATES_DIR = Path(sys._MEIPASS) / "templates"
+else:
+    TEMPLATES_DIR = Path(__file__).resolve().parents[1] / "templates"
+TEMPLATES_INDEX_PATH = TEMPLATES_DIR / "index.json"
+
+# Config
+if getattr(sys, "frozen", False) and getattr(sys, "_MEIPASS", None):
+    CONFIG_DIR = Path(sys._MEIPASS) / "config"
+else:
+    CONFIG_DIR = Path(__file__).resolve().parents[1] / "config"
+CONFIG_PATH = CONFIG_DIR / "config.json"
 
 
 

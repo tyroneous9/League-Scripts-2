@@ -6,7 +6,7 @@ import random
 import math
 from core.constants import DATA_DRAGON_DEFAULT_LOCALE, DATA_DRAGON_VERSIONS_URL, SCREEN_HEIGHT, SCREEN_WIDTH, GAME_DISTANCE_PARAMS
 from utils.config_utils import load_settings
-from utils.cv_utils import find_shop_location, find_player_location
+from utils.cv_utils import find_shop_location, find_player_location, find_shop_location_template
 from utils.general_utils import click_percent, send_keybind, move_mouse_percent
 _keybinds, _general = load_settings()
 
@@ -282,13 +282,13 @@ def buy_recommended_items(screen_manager):
     NOTE:
         Augment popups will automatically close the shop and also nullify interaction with it.
     """
-    shop_location = find_shop_location(screen_manager.get_latest_frame())
+    shop_location = find_shop_location_template(screen_manager.get_latest_frame())
     
     # Open shop if not already open
     if not shop_location:
         send_keybind("evtOpenShop", _keybinds)
         time.sleep(0.5)
-        shop_location = find_shop_location(screen_manager.get_latest_frame())
+        shop_location = find_shop_location_template(screen_manager.get_latest_frame())
         if not shop_location:
             send_keybind("evtOpenShop", _keybinds)
             time.sleep(0.5)
@@ -305,7 +305,7 @@ def buy_recommended_items(screen_manager):
     # Ensure shop is closed
     send_keybind("evtOpenShop", _keybinds)
     time.sleep(0.5)
-    if find_shop_location(screen_manager.get_latest_frame()):
+    if find_shop_location_template(screen_manager.get_latest_frame()):
         return False
     return True
 

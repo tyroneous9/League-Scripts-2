@@ -14,7 +14,7 @@ from core.constants import SCREEN_CENTER
 from core.live_client_manager import LiveClientManager
 from core.screen_manager import ScreenManager
 from utils.config_utils import load_settings
-from utils.cv_utils import find_arena_exit_location, find_augment_location, find_enemy_locations, find_player_location
+from utils.cv_utils import find_arena_exit_location_template, find_augment_location_template, find_enemy_locations, find_player_location
 from utils.game_utils import (
     attack_enemy,
     buy_items_list,
@@ -74,7 +74,7 @@ def run_game_loop(stop_event):
             game_ended = is_game_ended(latest_game_data)
 
         # Exits loop on game_ended or shutdown
-        exit_button = find_arena_exit_location(screen_manager.get_latest_frame())
+        exit_button = find_arena_exit_location_template(screen_manager.get_latest_frame())
         if exit_button:
             click_percent(exit_button[0], exit_button[1])
             game_ended = True
@@ -96,7 +96,7 @@ def run_game_loop(stop_event):
             time.sleep(5)
             end_time = 20 + time.monotonic()
             while not game_ended and not stop_event.is_set():
-                augment = find_augment_location(screen_manager.get_latest_frame())
+                augment = find_augment_location_template(screen_manager.get_latest_frame())
                 if augment:
                     click_percent(augment[0], augment[1])
                 if buy_recommended_items(screen_manager) == True:
@@ -108,7 +108,7 @@ def run_game_loop(stop_event):
                 level_up_abilities()
                 prev_level = current_level
             time.sleep(2)
-            augment = find_augment_location(screen_manager.get_latest_frame())
+            augment = find_augment_location_template(screen_manager.get_latest_frame())
             if augment:
                 click_percent(augment[0], augment[1])
             prev_gold = gold

@@ -1,0 +1,16 @@
+{
+  "1920x1080": {
+    "sell_btn": {
+      "path": "1920x1080\\sell_btn_1920x1080.png",
+      "blur": 3
+    },
+    "arena_exit_btn": {
+      "path": "1920x1080\\arena_exit_btn_1920x1080.png",
+      "blur": 3
+    },
+    "toggle_augments_btn": {
+      "path": "1920x1080\\toggle_augments_btn_1920x1080.png",
+      "blur": 3
+    }
+  }
+}

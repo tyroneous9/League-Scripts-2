@@ -13,7 +13,7 @@ class ScreenManager:
 
     def __init__(self):
         """
-        Initialize the ScreenManager and begins capturing frames.
+        Initialize the ScreenManager and begins capturing frames as BGR images.
         Args:
             target_fps (int): Frames per second to capture.
         """

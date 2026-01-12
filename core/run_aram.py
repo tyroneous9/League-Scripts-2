@@ -17,9 +17,7 @@ from utils.config_utils import load_settings
 from utils.general_utils import click_percent, move_mouse_percent, send_keybind, send_keybind
 from utils.game_utils import (
     attack_enemy,
-    buy_items_list,
     buy_recommended_items,
-    get_game_distance,
     is_game_ended,
     is_game_started,
     move_random_offset,
@@ -28,7 +26,7 @@ from utils.game_utils import (
     tether_offset,
     vote_surrender,
 )
-from utils.cv_utils import find_ally_locations, find_augment_location, find_enemy_locations, find_player_location
+from utils.cv_utils import find_ally_locations, find_augment_location_template, find_enemy_locations, find_player_location
 
 # ===========================
 # Main Bot Loop
@@ -92,7 +90,7 @@ def run_game_loop(stop_event):
             last_afk_check_time = time.time()
 
         # Check for augment
-        augment = find_augment_location(screen_manager.get_latest_frame())
+        augment = find_augment_location_template(screen_manager.get_latest_frame())
         if augment:
             click_percent(augment[0], augment[1])
             time.sleep(0.5)
@@ -108,7 +106,7 @@ def run_game_loop(stop_event):
         if current_hp == 0:
             end_time = 20 + time.monotonic()
             while not game_ended and not stop_event.is_set():
-                augment = find_augment_location(screen_manager.get_latest_frame())
+                augment = find_augment_location_template(screen_manager.get_latest_frame())
                 if augment:
                     click_percent(augment[0], augment[1])
                 if buy_recommended_items(screen_manager) == True:

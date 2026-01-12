@@ -29,7 +29,7 @@ from utils.game_utils import (
     tether_offset,
     vote_surrender,
 )
-from utils.cv_utils import find_ally_locations, find_augment_location, find_enemy_locations, find_player_location
+from utils.cv_utils import find_ally_locations, find_augment_location, find_enemy_locations, find_player_location, find_test_location
 
 
     
@@ -84,6 +84,10 @@ def run_game_loop(stop_event):
         # if player_location:
         #     for enemy_location in enemy_locations:
         #         attack_enemy(player_location, enemy_location, attack_range)
+        
+        # buy_recommended_items(screen_manager)
 
-        buy_recommended_items(screen_manager)
+        loc = find_test_location(screen_manager.get_latest_frame())
+        if loc:
+            move_mouse_percent(loc[0], loc[1])
         time.sleep(1)
