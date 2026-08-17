@@ -47,19 +47,10 @@ Each data source runs on its own thread/event loop and hands off state through l
 
 ## Key components
 
-### Event handling
-[`core/LCU_Manager.py`](core/LCU_Manager.py) utilizes `lcu_driver` as a transport layer to manage the connection to the LCU API. INTAI only needs to register handlers for WebSocket events such as changes in the client and game start/end. A gate (`asyncio.Event`) suspends every handler while closed, and events queue up and fire in order once the gate reopens. This ensures no race conditions between handlers.
-
-### Threaded polling with shared state
-[`core/live_client_manager.py`](core/live_client_manager.py) runs an isolated polling thread against the Live Client Data endpoint, writing into a `dict` guarded by a `threading.Lock`. Consumers never block the poller and always read a consistent snapshot.
-
-### GPU screen capture
-[`core/screen_manager.py`](core/screen_manager.py) wraps `dxcam` (DXGI desktop duplication) for lock-free 60 FPS frame capture, decoupling frame production from the detection/decision loop.
-
 ### Color-adjacency vision, no ML
-[`utils/cv_utils.py`](utils/cv_utils.py) locates champions and UI elements without templates or a trained model. Each health bar has a distinct two-color border (e.g. player/ally/enemy), so detection is reduced to finding pixels of color A directly adjacent to pixels of color B, computed vectorized over the full frame with NumPy/OpenCV masking + a cumulative-sum run-length check. The actual output location is offset by a fixed amount to factor the actual dimensions of the element.
+[`utils/cv_utils.py`](utils/cv_utils.py) locates champions and most UI elements using a niche image analysis technique: color-adjacency. For example, each health bar has a distinct two-color border (e.g. player/ally/enemy ), so detection reduces to finding pixels of color A directly adjacent to pixels of color B, checked in one pass over the full frame using OpenCV for masking and NumPy for vectorization and a cumulative-sum run-length check. The actual output location is offset by a fixed amount to factor the actual dimensions of the element.
 
-[`tools/run_visualizer.py`](tools/run_visualizer.py) is a standalone, read-only debug overlay that runs each detector against the live screen capture and draws a marker at every hit, with per-detector toggles, used to validate detection accuracy during development without affecting gameplay:
+[`tools/run_visualizer.py`](tools/run_visualizer.py) is a debug tool that runs each image detector against the live screen capture and draws a marker at every hit, with per-detector toggles, used to help me test detection accuracy during development.
 
 <p align="center"><em>Original frame</em></p>
 <p align="center">
@@ -75,29 +66,38 @@ Each data source runs on its own thread/event loop and hands off state through l
 
 ### Screen-space → game-space distance model
 
-**Why this needs a model at all:** the game never exposes world coordinates directly, and a naive "pixel distance ≈ game distance" assumption breaks immediately: two champions standing the same true distance apart produce a *different* pixel gap depending on where on screen that happens, because the 3D-to-2D projection is nonlinear (perspective, camera tilt, variable framing). Raw pixel measurements are useless for range checks until something corrects for that.
+**Why this needs a model at all:** the game never exposes world coordinates directly, and pixel distance does not scale linearly with game distance: two champions standing the same true distance apart produce a *different* pixel gap depending on where on screen that happens, because the 3D-to-2D projection is nonlinear (perspective, camera tilt, etc). Raw pixel measurements are useless for game distance calculations until something corrects for that.
 
-[`tools/game_distance_collector.py`](tools/game_distance_collector.py) captured on-screen pixel positions while a target sat at one of six known true distances, read off the game's own attack-range indicator circle (125, 250, 550, 594, 647, 700 units), across many player screen positions and headings. [`tools/analyze_game_distances.py`](tools/analyze_game_distances.py) then fit a parametric model against those samples (nonlinear least squares via SciPy):
+[`tools/game_distance_collector.py`](tools/game_distance_collector.py) was used to collect data about on-screen pixel positions while a target sat at one of six known true distances, found from champion attack ranges (125, 250, 550, 594, 647, 700 units). These ranges were tested across many player screen positions and camera angles. [`tools/analyze_game_distances.py`](tools/analyze_game_distances.py) then fit a parametric model against the data (using nonlinear least squares via SciPy):
 
 ```
 units = pixel_distance × unit_scale × pos_multiplier × sep_multiplier
 ```
 
-**A hypothesis about League's camera, not a documented fact:** Riot doesn't publish the camera's projection math, so `pos_multiplier` and `sep_multiplier` encode a reverse-engineered guess (not a derived spec) about *why* the projection distorts the way it does: that a fixed, player-following isometric camera foreshortens the world unevenly.
+**A hypothesis about League's camera, not a documented fact:** Riot doesn't publish the camera's projection math, so this model is merely a reverse-engineered guess about *why* the projection distorts the way it does.
 
 - **`pos_multiplier`** assumes a fixed pixel gap represents more world distance near the top of the screen (farther away, more foreshortened) than near the bottom (closer to the camera). It interpolates between a `v_top` and `v_bottom` coefficient based on the player's screen-Y position.
-- **`sep_multiplier`** assumes that same tilt foreshortens vertical screen separation more than horizontal separation, so the estimate is boosted the more vertical the gap between two points is.
+- **`sep_multiplier`** assumes that same tilt foreshortens vertical screen separation more than horizontal separation, so the estimate grows multiplicatively the more vertical the gap between two points is.
 
-The fitted coefficients are baked into [`core/constants.py`](core/constants.py) and consumed by `get_game_distance()` / `tether_offset()` in [`utils/game_utils.py`](utils/game_utils.py), letting the bot reason about attack range and kiting distance from screen pixels alone. The fit below (RMSE 51 / R² 0.95 against its own calibration data) suggests the hypothesis captures something real about the projection, though as [Future Improvements](#future-improvements) covers, it's an incomplete one.
+The fitted coefficients are saved into [`core/constants.py`](core/constants.py) and consumed by `get_game_distance()` / `tether_offset()` in [`utils/game_utils.py`](utils/game_utils.py), letting the bot reason game distance from screen pixels alone. The fit below (RMSE 51 / R² 0.95 against its own calibration data) suggests the hypothesis captures something real about the projection, though it is incomplete as covered in [Future Improvements](#future-improvements).
 
 <p align="center">
-  <img src="assets/distance_model_analysis.png" alt="Left: box plot showing the spread of measured pixel distance at each of the six calibrated true distances. Right: predicted vs. true parity plot for the shipped model against its own calibration data, RMSE 51 units, MAE 42 units, R-squared 0.95">
+  <img src="assets/distance_model_analysis.png">
 </p>
 
-<p align="center"><em>Left: the same true distance produces a wide range of pixel separations depending on where on screen it's measured, the reason a position/angle correction is needed at all. Right: the shipped model's predictions against its own calibration data (n=3,658): solid in the middle of the calibrated range, visibly biased at its edges (see <a href="#future-improvements">Future Improvements</a>).</em></p>
+<p align="center"><em>Left: the same true distance produces a wide range of pixel separations depending on where on screen it's measured, the reason a position/angle correction is needed at all. Right: the shipped model's predictions against its own calibration data (n=3,658): solid in the middle of the calibrated range, biased at edges (see <a href="#future-improvements">Future Improvements</a>).</em></p>
 
-### Pluggable, config-driven modes
-[`core/bot_manager.py`](core/bot_manager.py) dynamically imports the module registered for the active game mode (`core/constants.py`'s `SUPPORTED_MODES`) via `importlib` and runs its `run_game_loop` entry point on its own thread; adding a new mode is a new `core/run_<mode>.py` file plus one constants entry, no changes to the orchestration layer.
+### Event handling
+[`core/LCU_Manager.py`](core/LCU_Manager.py) utilizes `lcu_driver` as a transport layer to manage the connection to the LCU API. INTAI only needs to register handlers for WebSocket events such as changes in the client and game start/end. A gate (`asyncio.Event`) suspends every handler while closed, and events queue up and fire in order once the gate reopens. This ensures no race conditions between handlers.
+
+### Threaded polling with shared state
+[`core/live_client_manager.py`](core/live_client_manager.py) runs an isolated polling thread against the Live Client Data endpoint, writing into a `dict` guarded by a `threading.Lock`. Consumers never block the poller and always read/write a consistent snapshot from the dict.
+
+### GPU screen capture
+[`core/screen_manager.py`](core/screen_manager.py) wraps `dxcam` (DXGI desktop duplication) for 60 FPS frame capture, decoupling frame production from the detection/decision loop.
+
+### Pluggable config-based scripts
+[`core/bot_manager.py`](core/bot_manager.py) dynamically imports the module registered for the active game mode (`core/constants.py`'s `SUPPORTED_MODES`) via `importlib` and runs its `run_game_loop` entry point on its own thread; adding a new mode is a new `core/run_<mode>.py` file plus one constants entry, making development of new modes modular.
 
 ## Tech stack
 
