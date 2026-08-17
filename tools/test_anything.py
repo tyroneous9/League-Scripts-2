@@ -8,7 +8,6 @@ if _repo_root not in sys.path:
     sys.path.insert(0, _repo_root)
 
 import time
-import winsound
 import keyboard
 from core.constants import SCREEN_HEIGHT, SCREEN_WIDTH
 from core.screen_manager import ScreenManager

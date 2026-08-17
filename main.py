@@ -1,7 +1,6 @@
 # python -m core.main
 import logging
 import threading
-import winsound
 from utils.cv_utils import load_template_cache
 from utils.general_utils import enable_logging, listen_for_exit
 from core.menu import show_menu  
@@ -34,7 +33,7 @@ def shutdown():
         logging.exception("Error while stopping LCU manager")
 
     logging.info("Shut down complete.")
-    winsound.Beep(500,200)
+    print("\a", end="", flush=True)
 
 # ===========================
 # Main Entry Point

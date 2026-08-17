@@ -2,13 +2,11 @@ import datetime
 import os
 import threading
 import psutil
-import win32gui
-import win32api
-import win32con
+import pywinctl
+import pyautogui
 import time
 import keyboard
 import logging
-import win32process
 
 
 # ===========================
@@ -39,25 +37,20 @@ def click_percent(x, y, x_offset_percent=0, y_offset_percent=0, button="left"):
         y_offset_percent (float): Offset in percent of window height.
         button (str): 'left' or 'right' mouse button.
     """
-    hwnd = win32gui.GetForegroundWindow()
-    rect = win32gui.GetWindowRect(hwnd)
-    left, top, right, bottom = rect
-    window_width = right - left
-    window_height = bottom - top
+    window = pywinctl.getActiveWindow()
+    if window is None:
+        logging.warning("click_percent: no active window found.")
+        return
 
     # Apply percent offset if provided
-    new_x = x + int(window_width * (x_offset_percent / 100.0))
-    new_y = y + int(window_height * (y_offset_percent / 100.0))
+    new_x = x + int(window.width * (x_offset_percent / 100.0))
+    new_y = y + int(window.height * (y_offset_percent / 100.0))
 
-    win32api.SetCursorPos((new_x, new_y))
-    if button == "left":
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTDOWN, new_x, new_y, 0, 0)
+    pyautogui.moveTo(new_x, new_y)
+    if button in ("left", "right"):
+        pyautogui.mouseDown(button=button)
         time.sleep(0.05)
-        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP, new_x, new_y, 0, 0)
-    elif button == "right":
-        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTDOWN, new_x, new_y, 0, 0)
-        time.sleep(0.05)
-        win32api.mouse_event(win32con.MOUSEEVENTF_RIGHTUP, new_x, new_y, 0, 0)
+        pyautogui.mouseUp(button=button)
     else:
         logging.warning(f"Unknown mouse button: {button}. Use 'left' or 'right'.")
 
@@ -70,17 +63,16 @@ def move_mouse_percent(x, y, x_offset_percent=0, y_offset_percent=0):
     Returns:
         tuple: the final (x, y) coordinates the cursor was moved to.
     """
-    hwnd = win32gui.GetForegroundWindow()
-    rect = win32gui.GetWindowRect(hwnd)
-    left, top, right, bottom = rect
-    window_width = right - left
-    window_height = bottom - top
+    window = pywinctl.getActiveWindow()
+    if window is None:
+        logging.warning("move_mouse_percent: no active window found.")
+        return None
 
     # Apply percent offset if provided
-    new_x = x + int(window_width * (x_offset_percent / 100.0))
-    new_y = y + int(window_height * (y_offset_percent / 100.0))
+    new_x = x + int(window.width * (x_offset_percent / 100.0))
+    new_y = y + int(window.height * (y_offset_percent / 100.0))
 
-    win32api.SetCursorPos((new_x, new_y))
+    pyautogui.moveTo(new_x, new_y)
 
     return (new_x, new_y)
 
@@ -89,26 +81,13 @@ def click_on_cursor(button="left"):
     """
     Simulates a mouse click at the current cursor position.
     """
+    button_aliases = {"left": "left", "right": "right", "middle": "middle", "mmb": "middle", "mouse_middle": "middle"}
+    pyautogui_button = button_aliases.get(button)
+    if pyautogui_button is None:
+        logging.warning("Unknown mouse button: %s. Use 'left', 'right', or 'middle'.", button)
+        return
     try:
-        x, y = win32api.GetCursorPos()
-        if button == "left":
-            down = win32con.MOUSEEVENTF_LEFTDOWN
-            up = win32con.MOUSEEVENTF_LEFTUP
-        elif button == "right":
-            down = win32con.MOUSEEVENTF_RIGHTDOWN
-            up = win32con.MOUSEEVENTF_RIGHTUP
-        elif button in ("middle", "mmb", "mouse_middle"):
-            down = getattr(win32con, 'MOUSEEVENTF_MIDDLEDOWN', None)
-            up = getattr(win32con, 'MOUSEEVENTF_MIDDLEUP', None)
-            if down is None or up is None:
-                logging.warning("Middle button not supported on this platform.")
-                return
-        else:
-            logging.warning("Unknown mouse button: %s. Use 'left', 'right', or 'middle'.", button)
-            return
-        win32api.mouse_event(down, x, y, 0, 0)
-        time.sleep(0.01)
-        win32api.mouse_event(up, x, y, 0, 0)
+        pyautogui.click(button=pyautogui_button)
     except Exception:
         logging.error("click_on_cursor: unexpected error while clicking (button=%s)", button)
         raise Exception
@@ -191,13 +170,13 @@ def wait_for_window(window_title, timeout=60):
     """
     Waits for a window with the specified title to appear.
     Returns:
-        int | None: Window handle if found, otherwise None.
+        pywinctl.Window | None: Window object if found, otherwise None.
     """
     end_time = time.time() + timeout
     while time.time() < end_time:
-        hwnd = win32gui.FindWindow(None, window_title)
-        if hwnd:
-            return hwnd
+        windows = pywinctl.getWindowsWithTitle(window_title)
+        if windows:
+            return windows[0]
         time.sleep(1)
 
     logging.info(f"Window '{window_title}' is closed.")
@@ -215,29 +194,29 @@ def bring_window_to_front(window_title, timeout=60, retry_delay=0.5):
         retry_delay (float): Delay between attempts (seconds).
 
     Returns:
-        int | None: Window handle if successful, otherwise None.
+        pywinctl.Window | None: Window object if successful, otherwise None.
     """
     end_time = time.time() + timeout
-    hwnd = None
 
     while time.time() < end_time:
-        hwnd = win32gui.FindWindow(None, window_title)
+        windows = pywinctl.getWindowsWithTitle(window_title)
+        window = windows[0] if windows else None
 
-        if not hwnd:
+        if window is None:
             time.sleep(retry_delay)
             continue
 
         try:
             # Restore if minimized
-            win32gui.ShowWindow(hwnd, win32con.SW_RESTORE)
+            window.restore(wait=True)
             time.sleep(0.1)
 
-            win32gui.SetForegroundWindow(hwnd)
-            return hwnd  # success
+            window.activate(wait=True)
+            return window  # success
 
         except Exception as e:
             logging.debug(
-                f"Failed to bring '{window_title}' to front (hwnd={hwnd}): {e}"
+                f"Failed to bring '{window_title}' to front: {e}"
             )
 
         time.sleep(retry_delay)
@@ -249,10 +228,12 @@ def bring_window_to_front(window_title, timeout=60, retry_delay=0.5):
 
 
 def terminate_window(window_title):
-    hwnd = win32gui.FindWindow(None, window_title)
-    if hwnd:
-        # Get process ID from window handle
-        _, pid = win32process.GetWindowThreadProcessId(hwnd)
+    windows = pywinctl.getWindowsWithTitle(window_title)
+    if windows:
+        pid = windows[0].getPID()
+        if pid is None:
+            logging.error(f"Failed to get PID for window '{window_title}'.")
+            return
         try:
             proc = psutil.Process(pid)
             proc.terminate()  # or proc.kill() for immediate termination

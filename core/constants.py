@@ -2,7 +2,7 @@
 # Project-wide constants
 # ==========================================================
 
-import win32api
+import pyautogui
 import sys
 from pathlib import Path
 
@@ -99,9 +99,8 @@ DATA_DRAGON_DEFAULT_LOCALE = "en_US"
 # Tolerance for color masking
 THRESHHOLD = 70
 
-# Get screen dimensions using win32api
-SCREEN_WIDTH = win32api.GetSystemMetrics(0)
-SCREEN_HEIGHT = win32api.GetSystemMetrics(1)
+# Get screen dimensions (cross-platform: Windows and Linux)
+SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
 SCREEN_CENTER = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
 

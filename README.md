@@ -10,7 +10,7 @@ INTAI connects to two local League of Legends services and coordinates them thro
 
 - **League Client Update (LCU) API**: an authenticated WebSocket/REST API exposed by the running client. INTAI subscribes to gameflow and champion-select events to drive lobby creation, matchmaking, ready-check, and pick/ban.
 - **Live Client Data API**: a REST endpoint exposed by the game process itself during a match, polled for player/game state (health, level, events).
-- **Screen**: captured directly via the GPU (DXGI desktop duplication) since neither API exposes champion positions on screen. A lightweight color-based vision routine locates player, ally, and enemy champions from health-bar pixel signatures in real time.
+- **Screen**: captured directly via `mss` since neither API exposes champion positions on screen. A lightweight color-based vision routine locates player, ally, and enemy champions from health-bar pixel signatures in real time.
 
 Those three data sources feed a per-game-mode automation loop (ARAM, Arena, Summoner's Rift) that decides when to attack, retreat, level abilities, shop, and reposition.
 
@@ -27,7 +27,7 @@ flowchart LR
     subgraph INTAI["INTAI Runtime"]
         LCUManager["LCUManager<br/>asyncio event handlers"]
         LiveClientManager["LiveClientManager<br/>polling thread"]
-        ScreenManager["ScreenManager<br/>dxcam capture thread"]
+        ScreenManager["ScreenManager<br/>mss capture thread"]
         CV["cv_utils<br/>color-adjacency detection"]
         BotManager["BotManager<br/>dynamic mode dispatch"]
         Loop["run_&lt;mode&gt;.py<br/>game loop thread"]
@@ -93,8 +93,8 @@ The fitted coefficients are saved into [`core/constants.py`](core/constants.py) 
 ### Threaded polling with shared state
 [`core/live_client_manager.py`](core/live_client_manager.py) runs an isolated polling thread against the Live Client Data endpoint, writing into a `dict` guarded by a `threading.Lock`. Consumers never block the poller and always read/write a consistent snapshot from the dict.
 
-### GPU screen capture
-[`core/screen_manager.py`](core/screen_manager.py) wraps `dxcam` (DXGI desktop duplication) for 60 FPS frame capture, decoupling frame production from the detection/decision loop.
+### Screen capture
+[`core/screen_manager.py`](core/screen_manager.py) wraps `mss` (Windows via GDI, Linux via X11) on a background thread targeting 60 FPS, decoupling frame production from the detection/decision loop.
 
 ### Pluggable config-based scripts
 [`core/bot_manager.py`](core/bot_manager.py) dynamically imports the module registered for the active game mode (`core/constants.py`'s `SUPPORTED_MODES`) via `importlib` and runs its `run_game_loop` entry point on its own thread; adding a new mode is a new `core/run_<mode>.py` file plus one constants entry, making development of new modes modular.
@@ -105,13 +105,13 @@ The fitted coefficients are saved into [`core/constants.py`](core/constants.py) 
 |---|---|
 | Language | Python 3.11 |
 | Computer vision | OpenCV, NumPy |
-| Screen capture | dxcam (DXGI desktop duplication) |
+| Screen capture | `mss` (Windows and Linux) |
 | Client integration | `lcu_driver` (asyncio), `requests` |
 | Concurrency | `asyncio`, `threading` (locks, events) |
 | Modeling | SciPy (`least_squares`), bounded nonlinear regression |
 | Desktop UI | Tkinter |
 | Packaging | PyInstaller |
-| Windows integration | `pywin32`, `keyboard` |
+| Input & window control | `pyautogui`, `pywinctl`, `keyboard` |
 
 ## Repository layout
 

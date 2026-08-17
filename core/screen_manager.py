@@ -1,65 +1,81 @@
 import logging
+import threading
 import time
 import os
 import cv2
-import dxcam
+import mss
+import numpy as np
 
 
 class ScreenManager:
     """
-    DXGI-based screen capture manager using `dxcam`.
+    mss-based screen capture manager (Windows and Linux).
     Does NOT lock frame updates — latest frame may be corrupted if read during update.
     """
 
     def __init__(self):
         """
-        Initialize the ScreenManager and begins capturing frames as BGR images.
-        Args:
-            target_fps (int): Frames per second to capture.
+        Initialize the ScreenManager. Call `start_camera` to begin capturing
+        frames as BGR images on a background thread.
         """
-        self._camera = dxcam.create(output_color="BGR")
-
+        self._thread = None
+        self._stop_event = threading.Event()
+        self._latest_frame = None
 
     def is_capturing(self):
         """
         Returns whether the capture thread is running.
         """
-        return self._camera.is_capturing
-    
+        return self._thread is not None and self._thread.is_alive()
 
     def start_camera(self, target_fps=60):
         """
         Starts the capture thread.
         """
-        
-        self._camera.start(target_fps=target_fps)
-        while self._camera.get_latest_frame() is None:
+        self._stop_event.clear()
+        self._thread = threading.Thread(target=self._capture_loop, args=(target_fps,), daemon=True)
+        self._thread.start()
+        while self.get_latest_frame() is None:
             time.sleep(0.01)
-
 
     def stop_camera(self):
         """
         Stops the capture thread and releases resources.
         """
-        if self._camera:
-            self._camera.stop()
-            del self._camera
+        if self._thread is not None:
+            self._stop_event.set()
+            self._thread.join()
+            self._thread = None
         else:
             logging.info("ScreenManager camera is not running, nothing to stop.")
 
+    def _capture_loop(self, target_fps):
+        interval = 1.0 / target_fps if target_fps > 0 else 0
+        with mss.MSS() as sct:
+            monitor = sct.monitors[1]
+            while not self._stop_event.is_set():
+                loop_start = time.time()
+                shot = sct.grab(monitor)
+                self._latest_frame = np.array(shot)[:, :, :3]
+                elapsed = time.time() - loop_start
+                sleep_time = interval - elapsed
+                if sleep_time > 0:
+                    time.sleep(sleep_time)
 
     def get_latest_frame(self):
         """
         Returns the latest captured frame.
         """
-        return self._camera.get_latest_frame()
-    
+        return self._latest_frame
+
     def grab(self):
         """
         Captures and returns the current frame without needing to start the camera.
         """
-        return self._camera.grab()
-    
+        with mss.MSS() as sct:
+            monitor = sct.monitors[1]
+            shot = sct.grab(monitor)
+            return np.array(shot)[:, :, :3]
 
     def save_screenshot(self, file_name="screenshot"):
         """
