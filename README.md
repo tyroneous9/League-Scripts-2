@@ -126,7 +126,7 @@ docs/       Notes for extending the module system
 
 ## Future Improvements
 
-Known gaps in the current implementation, and what closing them would take:
+Known issues in the current implementation, and possible fixes:
 
 1. **Calibration covers only six discrete true distances (125–700 units), all from one test setup.** Coverage of screen position and heading at each distance is good, but the error is not uniform across that range: at the shortest calibrated distance (125 units) the model **over-predicts by 71 units on average — a 57% relative error** — and at the longest (700 units) it **under-predicts by ~37 units (~6%)**, with mid-range distances (550–594) landing much closer (3.7–4.1%). Melee-range combat and full-screen retreats both fall outside or at the ragged edge of what was ever validated, which is exactly where `attack_enemy()` and `retreat()` need the estimate to be trustworthy.
 2. **Camera zoom is never measured or locked.** The whole pixel→unit mapping implicitly assumes whatever zoom level was active during calibration in the Practice Tool. Nothing in the runtime checks or normalizes for zoom, so any drift between calibration and live play — including a player simply scrolling to zoom mid-match — scales every distance estimate uniformly wrong.
