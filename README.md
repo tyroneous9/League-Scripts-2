@@ -59,6 +59,14 @@ Each data source runs on its own thread/event loop and hands off state through l
 ### Color-adjacency vision, no ML
 [`utils/cv_utils.py`](utils/cv_utils.py) locates champions and UI elements without templates or a trained model. Each health bar has a distinct two-color border (e.g. player/ally/enemy), so detection is reduced to finding pixels of color A directly adjacent to pixels of color B, computed vectorized over the full frame with NumPy/OpenCV masking + a cumulative-sum run-length check — no per-pixel Python loop.
 
+[`tools/run_visualizer.py`](tools/run_visualizer.py) is a standalone, read-only debug overlay that runs each detector against the live screen capture and draws a marker at every hit, with per-detector toggles — used to validate detection accuracy during development without affecting gameplay:
+
+<p align="center">
+  <img src="assets/visualizer_demo.png" alt="Detection visualizer output on a practice-tool test frame: correctly marks the ally (blue), enemy (red), and player (green health bar) targets" width="70%">
+</p>
+
+<p align="center"><em>Output of the same detector functions run against a static test frame — blue/red health bars correctly tagged as ally/enemy, and the green "Gatekeeper" bar tagged as the player.</em></p>
+
 <p align="center">
   <img src="assets/health_references.png" alt="Health bar color references used for detection" width="45%">
   <img src="assets/augment_reference.png" alt="Augment button color references used for detection" width="45%">
@@ -69,9 +77,6 @@ The game never exposes world coordinates directly, and the projection from 3D wo
 
 ### Pluggable, config-driven modes
 [`core/bot_manager.py`](core/bot_manager.py) dynamically imports the module registered for the active game mode (`core/constants.py`'s `SUPPORTED_MODES`) via `importlib` and runs its `run_game_loop` entry point on its own thread — adding a new mode is a new `core/run_<mode>.py` file plus one constants entry, no changes to the orchestration layer.
-
-### Packaging
-A Tkinter settings/mode-select UI ([`core/menu.py`](core/menu.py)) sits in front of the runtime, and [`INTAI.spec`](INTAI.spec) + [`build.bat`](build.bat) package the whole app into a single Windows executable via PyInstaller.
 
 ## Tech stack
 
@@ -92,7 +97,7 @@ A Tkinter settings/mode-select UI ([`core/menu.py`](core/menu.py)) sits in front
 ```
 core/       LCU/live-data managers, screen capture, per-mode game loops, menu UI
 utils/      CV routines, game-state helpers, input simulation, config I/O
-tools/      Offline data collection + regression fitting for the distance model
+tools/      Offline data collection + regression fitting for the distance model, detection visualizer
 config/     Runtime config (keybinds, selected mode, resolution)
 data/       Collected screen/game-distance samples used to fit the projection model
 docs/       Notes for extending the module system
