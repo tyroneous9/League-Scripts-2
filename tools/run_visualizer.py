@@ -1,21 +1,18 @@
 """
-Live visual overlay for the color-adjacency detectors in `utils/cv_utils.py`.
+Screenshot visualizer for the color-adjacency detectors in `utils/cv_utils.py`.
 
-Captures the screen, runs the selected detector(s) every frame, and draws a
-marker at each detected location so you can see what the bot "sees" in real
-time. Purely observational — reads the screen only, never moves the mouse or
-sends input.
-
-Focus the preview window and press a number key to toggle a detector:
-  1 Player   2 Allies       3 Enemies     4 Attached ally
-  5 Augment  6 Shop         7 Arena exit
-  Q / ESC to quit.
+Captures a single screenshot, runs every registered detector against it, and
+draws a generic bounding box at each detected location -- the drawing step
+has no idea what a given detector was looking for, it just marks wherever a
+detector returned a coordinate. The annotated screenshot is written to
+`data/visualizations/`. Purely observational -- reads the screen only, never
+moves the mouse or sends input.
 """
 
 import os
 import sys
-import time
 import logging
+from datetime import datetime
 
 import cv2
 
@@ -36,93 +33,67 @@ from utils.cv_utils import (
 
 logging.basicConfig(level=logging.INFO)
 
-WINDOW_NAME = "INTAI Detection Visualizer"
-DISPLAY_SCALE = 0.5  # shrink the captured frame before drawing/showing it
+OUT_DIR = os.path.join(_repo_root, "data", "visualizations")
 
-# (label, toggle key, BGR color, detector fn, "point" | "points")
+MARKER_COLOR = (0, 255, 0)
+BOX_HALF_SIZE = 22
+
+# Every detector to run. Each returns a single (x, y), a list of (x, y), or a
+# falsy value if nothing was found -- the caller doesn't need to know which.
 DETECTORS = [
-    ("Player",        ord('1'), (0, 255, 255),   find_player_location,        "point"),
-    ("Allies",        ord('2'), (255, 200, 0),   find_ally_locations,         "points"),
-    ("Enemies",       ord('3'), (0, 0, 255),     find_enemy_locations,        "points"),
-    ("Attached ally", ord('4'), (255, 0, 255),   find_attached_ally_location, "point"),
-    ("Augment",       ord('5'), (0, 200, 0),     find_augment_location,       "point"),
-    ("Shop",          ord('6'), (200, 200, 200), find_shop_location,          "point"),
-    ("Arena exit",    ord('7'), (0, 165, 255),   find_arena_exit_location,    "point"),
+    find_player_location,
+    find_ally_locations,
+    find_enemy_locations,
+    find_attached_ally_location,
+    find_augment_location,
+    find_shop_location,
+    find_arena_exit_location,
 ]
 
 
-def draw_marker(frame, x, y, color, label):
-    cv2.drawMarker(frame, (x, y), color, markerType=cv2.MARKER_CROSS, markerSize=18, thickness=2)
-    cv2.circle(frame, (x, y), 14, color, 2)
-    cv2.putText(frame, label, (x + 16, y - 10), cv2.FONT_H0ERSHEY_SIMPLEX, 0.5, color, 1, cv2.LINE_AA)
+def _as_points(result):
+    """Normalize a detector's return value into a list of (x, y) points."""
+    if not result:
+        return []
+    if isinstance(result[0], (int, float)):
+        return [result]
+    return list(result)
 
 
-def draw_legend(frame, enabled):
-    y = 20
-    for label, key, color, _, _ in DETECTORS:
-        state = "ON" if enabled[key] else "off"
-        cv2.putText(frame, f"[{chr(key)}] {label}: {state}", (10, y),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, color if enabled[key] else (90, 90, 90), 1, cv2.LINE_AA)
-        y += 20
+def draw_detection(frame, x, y):
+    """Marks a detected location with a generic box + crosshair, regardless of what was found."""
+    cv2.rectangle(frame, (x - BOX_HALF_SIZE, y - BOX_HALF_SIZE), (x + BOX_HALF_SIZE, y + BOX_HALF_SIZE), MARKER_COLOR, 2)
+    cv2.drawMarker(frame, (x, y), MARKER_COLOR, markerType=cv2.MARKER_CROSS, markerSize=12, thickness=1)
 
 
 def main():
     sm = ScreenManager()
-    sm.start_camera(target_fps=60)
+    frame = sm.grab()
+    if frame is None:
+        logging.error("Failed to capture a screenshot.")
+        return
 
-    enabled = {key: True for _, key, _, _, _ in DETECTORS}
+    annotated = frame.copy()
+    total_hits = 0
 
-    logging.info("Visualizer running. Focus the preview window, press number keys to toggle detectors, Q/ESC to quit.")
+    for finder in DETECTORS:
+        try:
+            result = finder(frame)
+        except Exception:
+            logging.exception("Detector '%s' failed", finder.__name__)
+            continue
 
-    prev_time = time.time()
-    fps = 0.0
+        points = _as_points(result)
+        for x, y in points:
+            draw_detection(annotated, int(x), int(y))
+        total_hits += len(points)
+        logging.info("%s: %d detection(s)", finder.__name__, len(points))
 
-    try:
-        while True:
-            frame = sm.get_latest_frame()
-            if frame is None:
-                time.sleep(0.01)
-                continue
+    os.makedirs(OUT_DIR, exist_ok=True)
+    out_path = os.path.join(OUT_DIR, f"visualization_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png")
+    cv2.imwrite(out_path, annotated)
 
-            display = frame.copy()
-
-            for label, key, color, finder, kind in DETECTORS:
-                if not enabled[key]:
-                    continue
-                try:
-                    result = finder(frame)
-                except Exception:
-                    logging.exception("Detector '%s' failed", label)
-                    continue
-                if not result:
-                    continue
-                points = result if kind == "points" else [result]
-                for x, y in points:
-                    draw_marker(display, int(x), int(y), color, label)
-
-            draw_legend(display, enabled)
-
-            now = time.time()
-            fps = 0.9 * fps + 0.1 * (1.0 / max(now - prev_time, 1e-6))
-            prev_time = now
-            cv2.putText(display, f"FPS: {fps:.0f}", (10, display.shape[0] - 15),
-                        cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 255), 1, cv2.LINE_AA)
-
-            if DISPLAY_SCALE != 1.0:
-                display = cv2.resize(display, None, fx=DISPLAY_SCALE, fy=DISPLAY_SCALE)
-
-            cv2.imshow(WINDOW_NAME, display)
-            k = cv2.waitKey(1) & 0xFF
-            if k in (27, ord('q')):
-                break
-            if k in enabled:
-                enabled[k] = not enabled[k]
-
-    except KeyboardInterrupt:
-        pass
-    finally:
-        sm.stop_camera()
-        cv2.destroyAllWindows()
+    logging.info("Saved %d total detection(s) to %s", total_hits, out_path)
 
 
 if __name__ == "__main__":

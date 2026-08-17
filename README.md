@@ -1,6 +1,6 @@
 # INTAI
 
-An application that drives League of Legends' client and in-game APIs end-to-end — lobby creation, champion select, and live gameplay — using a real-time computer-vision pipeline built without any ML models or template matching.
+A Windows application that drives League of Legends' client and in-game APIs end-to-end — lobby creation, champion select, and live gameplay — using a real-time computer-vision pipeline built without any ML models or template matching.
 
 > **Note:** This is a personal research project exploring real-time CV, async event-driven systems, and reverse-engineered client APIs. Automating gameplay against Riot's live services violates the League of Legends Terms of Service.
 
