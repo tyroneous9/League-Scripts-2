@@ -47,8 +47,8 @@ Each data source runs on its own thread/event loop and hands off state through l
 
 ## Key components
 
-### Event-driven LCU integration
-[`core/LCU_Manager.py`](core/LCU_Manager.py) wraps `lcu_driver`'s asyncio `Connector`, registering handlers for gameflow-phase and champ-select-session WebSocket events. A gate (`asyncio.Event`) lets the rest of the app pause/resume every handler atomically, used to stop reacting to client events while a match is in progress and cleanly hand off control to the in-game bot thread.
+### Event handling
+[`core/LCU_Manager.py`](core/LCU_Manager.py) utilizes `lcu_driver` as a transport layer to manage the connection to the LCU API. INTAI only needs to register handlers for WebSocket events such as changes in the client and game start/end. A gate (`asyncio.Event`) suspends every handler while closed, and events queue up and fire in order once the gate reopens. This ensures no race conditions between handlers.
 
 ### Threaded polling with shared state
 [`core/live_client_manager.py`](core/live_client_manager.py) runs an isolated polling thread against the Live Client Data endpoint, writing into a `dict` guarded by a `threading.Lock`. Consumers never block the poller and always read a consistent snapshot.
