@@ -65,7 +65,7 @@ Each data source runs on its own thread/event loop and hands off state through l
   <img src="assets/visualizer_demo.png" alt="Detection visualizer output on a practice-tool test frame: correctly marks the ally (blue), enemy (red), and player (green health bar) targets" width="70%">
 </p>
 
-<p align="center"><em>Output of the same detector functions run against a static test frame — blue/red health bars correctly tagged as ally/enemy, and the green "Gatekeeper" bar tagged as the player.</em></p>
+<p align="center"><em>Output from detection visualizer</em></p>
 
 <p align="center">
   <img src="assets/health_references.png" alt="Health bar color references used for detection" width="45%">
