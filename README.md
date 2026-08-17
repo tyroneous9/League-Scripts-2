@@ -2,7 +2,7 @@
 
 A Windows application that drives League of Legends' client and in-game APIs end-to-end — lobby creation, champion select, and live gameplay — using a real-time computer-vision pipeline built without any ML models or template matching.
 
-> **Note:** This is a personal research project exploring real-time CV, async event-driven systems, and reverse-engineered client APIs. Automating gameplay against Riot's live services violates the League of Legends Terms of Service.
+> **Note:** This is a personal research project exploring real-time CV, async event-driven systems, and reverse-engineered client APIs. Running this program in a live game environment to automate gameplay violates the League of Legends Terms of Service.
 
 ## What it does
 
@@ -57,7 +57,7 @@ Each data source runs on its own thread/event loop and hands off state through l
 [`core/screen_manager.py`](core/screen_manager.py) wraps `dxcam` (DXGI desktop duplication) for lock-free 60 FPS frame capture, decoupling frame production from the detection/decision loop.
 
 ### Color-adjacency vision, no ML
-[`utils/cv_utils.py`](utils/cv_utils.py) locates champions and UI elements without templates or a trained model. Each health bar has a distinct two-color border (e.g. player/ally/enemy), so detection is reduced to finding pixels of color A directly adjacent to pixels of color B, computed vectorized over the full frame with NumPy/OpenCV masking + a cumulative-sum run-length check — no per-pixel Python loop.
+[`utils/cv_utils.py`](utils/cv_utils.py) locates champions and UI elements without templates or a trained model. Each health bar has a distinct two-color border (e.g. player/ally/enemy), so detection is reduced to finding pixels of color A directly adjacent to pixels of color B, computed vectorized over the full frame with NumPy/OpenCV masking + a cumulative-sum run-length check. The actual output location is offset by a fixed amount to factor the actual dimensions of the element.
 
 [`tools/run_visualizer.py`](tools/run_visualizer.py) is a standalone, read-only debug overlay that runs each detector against the live screen capture and draws a marker at every hit, with per-detector toggles — used to validate detection accuracy during development without affecting gameplay:
 
@@ -74,7 +74,22 @@ Each data source runs on its own thread/event loop and hands off state through l
 
 
 ### Screen-space → game-space distance model
-The game never exposes world coordinates directly, and the projection from 3D world space to the 2D screen is nonlinear (perspective, camera tilt, variable UI framing). [`tools/game_distance_collector.py`](tools/game_distance_collector.py) captured paired samples of on-screen pixel separation vs. known in-game unit distance; [`tools/analyze_game_distances.py`](tools/analyze_game_distances.py) fits a parametric model (nonlinear least squares via SciPy) over vertical screen position and separation angle, then layers a ridge regression on the residuals for a hybrid estimator — validated with k-fold cross-validation, feature permutation importance, and ablation tests before the final coefficients were baked into [`core/constants.py`](core/constants.py). The resulting `get_game_distance()` / `tether_offset()` functions in [`utils/game_utils.py`](utils/game_utils.py) let the bot reason about attack range and kiting distance from screen pixels alone.
+The game never exposes world coordinates directly, and the projection from 3D world space to the 2D screen is nonlinear (perspective, camera tilt, variable UI framing). [`tools/game_distance_collector.py`](tools/game_distance_collector.py) captured on-screen pixel positions while a target sat at one of six known true distances — read off the game's own attack-range indicator circle (125, 250, 550, 594, 647, 700 units) — across many player screen positions and headings. [`tools/analyze_game_distances.py`](tools/analyze_game_distances.py) then fit a parametric model against those samples (nonlinear least squares via SciPy):
+
+```
+units = pixel_distance × unit_scale × pos_multiplier × sep_multiplier
+```
+
+- **`pos_multiplier`** corrects for the camera's vertical tilt: because the camera follows the player at a fixed isometric angle, a fixed pixel gap represents more world distance near the top of the screen (farther away, more foreshortened) than near the bottom (closer to the camera). It interpolates between a `v_top` and `v_bottom` coefficient based on the player's screen-Y position.
+- **`sep_multiplier`** corrects for separation angle: the same tilt foreshortens vertical screen separation more than horizontal separation, so the estimate is boosted the more vertical the gap between the two points is.
+
+The fitted coefficients are baked into [`core/constants.py`](core/constants.py) and consumed by `get_game_distance()` / `tether_offset()` in [`utils/game_utils.py`](utils/game_utils.py), letting the bot reason about attack range and kiting distance from screen pixels alone.
+
+<p align="center">
+  <img src="assets/distance_model_analysis.png" alt="Left: box plot showing the spread of measured pixel distance at each of the six calibrated true distances. Right: predicted vs. true parity plot for the shipped model against its own calibration data, RMSE 51 units, MAE 42 units, R-squared 0.95">
+</p>
+
+<p align="center"><em>Left: the same true distance produces a wide range of pixel separations depending on where on screen it's measured — the reason a position/angle correction is needed at all. Right: the shipped model's predictions against its own calibration data (n=3,658) — solid in the middle of the calibrated range, visibly biased at its edges (see <a href="#future-improvements">Future Improvements</a>).</em></p>
 
 ### Pluggable, config-driven modes
 [`core/bot_manager.py`](core/bot_manager.py) dynamically imports the module registered for the active game mode (`core/constants.py`'s `SUPPORTED_MODES`) via `importlib` and runs its `run_game_loop` entry point on its own thread — adding a new mode is a new `core/run_<mode>.py` file plus one constants entry, no changes to the orchestration layer.
@@ -103,3 +118,14 @@ config/     Runtime config (keybinds, selected mode, resolution)
 data/       Collected screen/game-distance samples used to fit the projection model
 docs/       Notes for extending the module system
 ```
+
+## Future Improvements
+
+The distance model is the clearest example of unfinished work in this project — development was paused before it was reliable across the full range the bot actually operates in. Re-running the shipped coefficients against their own calibration data (n=3,658, [`data/game_distance_samples_clean.csv`](data/game_distance_samples_clean.csv)) makes the gaps concrete:
+
+1. **Calibration covers only six discrete true distances (125–700 units), all from one test setup.** Coverage of screen position and heading at each distance is good, but the error is not uniform across that range: at the shortest calibrated distance (125 units) the model **over-predicts by 71 units on average — a 57% relative error** — and at the longest (700 units) it **under-predicts by ~37 units (~6%)**, with mid-range distances (550–594) landing much closer (3.7–4.1%). Melee-range combat and full-screen retreats both fall outside or at the ragged edge of what was ever validated, which is exactly where `attack_enemy()` and `retreat()` need the estimate to be trustworthy.
+2. **Camera zoom is never measured or locked.** The whole pixel→unit mapping implicitly assumes whatever zoom level was active during calibration in the Practice Tool. Nothing in the runtime checks or normalizes for zoom, so any drift between calibration and live play — including a player simply scrolling to zoom mid-match — scales every distance estimate uniformly wrong.
+3. **The runtime formula and the fitted formula have quietly diverged.** The function `analyze_game_distances.py` actually optimized against (`predict_units()`) has no floor clamp on `pos_multiplier` — it was explicitly removed there. The shipped `get_game_distance()` adds a `pos_multiplier_min` clamp and an inert `wiggle_coeff` cubic term that were never part of the fitting process, so the coefficients are optimal for a formula slightly different from the one that's actually running.
+4. **The stronger model was measured but never wired in.** The analysis script builds and cross-validates a hybrid estimator — the parametric fit plus a ridge regression on its residuals — and reports it beating the plain parametric model. That correction is written to `data/game_distance_combined_report.json` but `get_game_distance()` only implements the weaker plain-parametric term.
+
+Addressing this would mean: collecting continuous (not six-point) ground truth across a wider distance range with per-bucket error tracking, detecting or locking camera zoom before trusting an estimate, reconciling the fitting and runtime formulas so the coefficients are optimized for the code path that actually ships, and either integrating the residual-correction model or removing the unused analysis path.
