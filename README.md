@@ -74,16 +74,21 @@ Each data source runs on its own thread/event loop and hands off state through l
 
 
 ### Screen-space → game-space distance model
-The game never exposes world coordinates directly, and the projection from 3D world space to the 2D screen is nonlinear (perspective, camera tilt, variable UI framing). [`tools/game_distance_collector.py`](tools/game_distance_collector.py) captured on-screen pixel positions while a target sat at one of six known true distances — read off the game's own attack-range indicator circle (125, 250, 550, 594, 647, 700 units) — across many player screen positions and headings. [`tools/analyze_game_distances.py`](tools/analyze_game_distances.py) then fit a parametric model against those samples (nonlinear least squares via SciPy):
+
+**Why this needs a model at all:** the game never exposes world coordinates directly, and a naive "pixel distance ≈ game distance" assumption breaks immediately — two champions standing the same true distance apart produce a *different* pixel gap depending on where on screen that happens, because the 3D-to-2D projection is nonlinear (perspective, camera tilt, variable framing). Raw pixel measurements are useless for range checks until something corrects for that.
+
+[`tools/game_distance_collector.py`](tools/game_distance_collector.py) captured on-screen pixel positions while a target sat at one of six known true distances — read off the game's own attack-range indicator circle (125, 250, 550, 594, 647, 700 units) — across many player screen positions and headings. [`tools/analyze_game_distances.py`](tools/analyze_game_distances.py) then fit a parametric model against those samples (nonlinear least squares via SciPy):
 
 ```
 units = pixel_distance × unit_scale × pos_multiplier × sep_multiplier
 ```
 
-- **`pos_multiplier`** corrects for the camera's vertical tilt: because the camera follows the player at a fixed isometric angle, a fixed pixel gap represents more world distance near the top of the screen (farther away, more foreshortened) than near the bottom (closer to the camera). It interpolates between a `v_top` and `v_bottom` coefficient based on the player's screen-Y position.
-- **`sep_multiplier`** corrects for separation angle: the same tilt foreshortens vertical screen separation more than horizontal separation, so the estimate is boosted the more vertical the gap between the two points is.
+**A hypothesis about League's camera, not a documented fact:** Riot doesn't publish the camera's projection math, so `pos_multiplier` and `sep_multiplier` encode a reverse-engineered guess — not a derived spec — about *why* the projection distorts the way it does: that a fixed, player-following isometric camera foreshortens the world unevenly.
 
-The fitted coefficients are baked into [`core/constants.py`](core/constants.py) and consumed by `get_game_distance()` / `tether_offset()` in [`utils/game_utils.py`](utils/game_utils.py), letting the bot reason about attack range and kiting distance from screen pixels alone.
+- **`pos_multiplier`** assumes a fixed pixel gap represents more world distance near the top of the screen (farther away, more foreshortened) than near the bottom (closer to the camera). It interpolates between a `v_top` and `v_bottom` coefficient based on the player's screen-Y position.
+- **`sep_multiplier`** assumes that same tilt foreshortens vertical screen separation more than horizontal separation, so the estimate is boosted the more vertical the gap between two points is.
+
+The fitted coefficients are baked into [`core/constants.py`](core/constants.py) and consumed by `get_game_distance()` / `tether_offset()` in [`utils/game_utils.py`](utils/game_utils.py), letting the bot reason about attack range and kiting distance from screen pixels alone. The fit below (RMSE 51 / R² 0.95 against its own calibration data) suggests the hypothesis captures something real about the projection — though as [Future Improvements](#future-improvements) covers, it's an incomplete one.
 
 <p align="center">
   <img src="assets/distance_model_analysis.png" alt="Left: box plot showing the spread of measured pixel distance at each of the six calibrated true distances. Right: predicted vs. true parity plot for the shipped model against its own calibration data, RMSE 51 units, MAE 42 units, R-squared 0.95">
@@ -103,7 +108,7 @@ The fitted coefficients are baked into [`core/constants.py`](core/constants.py) 
 | Screen capture | dxcam (DXGI desktop duplication) |
 | Client integration | `lcu_driver` (asyncio), `requests` |
 | Concurrency | `asyncio`, `threading` (locks, events) |
-| Modeling | SciPy (`least_squares`), NumPy (ridge regression, k-fold CV) |
+| Modeling | SciPy (`least_squares`) — bounded nonlinear regression |
 | Desktop UI | Tkinter |
 | Packaging | PyInstaller |
 | Windows integration | `pywin32`, `keyboard` |
@@ -121,11 +126,12 @@ docs/       Notes for extending the module system
 
 ## Future Improvements
 
-The distance model is the clearest example of unfinished work in this project — development was paused before it was reliable across the full range the bot actually operates in. Re-running the shipped coefficients against their own calibration data (n=3,658, [`data/game_distance_samples_clean.csv`](data/game_distance_samples_clean.csv)) makes the gaps concrete:
+Known gaps in the current implementation, and what closing them would take:
 
 1. **Calibration covers only six discrete true distances (125–700 units), all from one test setup.** Coverage of screen position and heading at each distance is good, but the error is not uniform across that range: at the shortest calibrated distance (125 units) the model **over-predicts by 71 units on average — a 57% relative error** — and at the longest (700 units) it **under-predicts by ~37 units (~6%)**, with mid-range distances (550–594) landing much closer (3.7–4.1%). Melee-range combat and full-screen retreats both fall outside or at the ragged edge of what was ever validated, which is exactly where `attack_enemy()` and `retreat()` need the estimate to be trustworthy.
 2. **Camera zoom is never measured or locked.** The whole pixel→unit mapping implicitly assumes whatever zoom level was active during calibration in the Practice Tool. Nothing in the runtime checks or normalizes for zoom, so any drift between calibration and live play — including a player simply scrolling to zoom mid-match — scales every distance estimate uniformly wrong.
 3. **The runtime formula and the fitted formula have quietly diverged.** The function `analyze_game_distances.py` actually optimized against (`predict_units()`) has no floor clamp on `pos_multiplier` — it was explicitly removed there. The shipped `get_game_distance()` adds a `pos_multiplier_min` clamp and an inert `wiggle_coeff` cubic term that were never part of the fitting process, so the coefficients are optimal for a formula slightly different from the one that's actually running.
-4. **The stronger model was measured but never wired in.** The analysis script builds and cross-validates a hybrid estimator — the parametric fit plus a ridge regression on its residuals — and reports it beating the plain parametric model. That correction is written to `data/game_distance_combined_report.json` but `get_game_distance()` only implements the weaker plain-parametric term.
+4. **The intended hybrid model was scaffolded but never finished.** `analyze_game_distances.py` sets out to layer a ridge regression on the parametric model's residuals — with cross-validation, permutation importance, and ablation tests — but `compute_features()`, the function that builds the input features for that regression, is mid-edit: it computes per-row features and then never appends them to a return value. Running the script today throws `TypeError: cannot unpack non-iterable NoneType object` at that call. The plain parametric model (items 1–3 above) is the only part of this pipeline that ever actually produced a working result.
+5. **Color-adjacency detection is calibrated to one exact display configuration.** The BGR reference values in `core/constants.py` (`HEALTH_LEFT_COLOR`, `PLAYER_HEALTH_RIGHT_COLOR`, etc.) and their tight per-call tolerances (typically ±1–5 per channel, see the `find_*_location` calls in `cv_utils.py`) were sampled once, under one monitor/GPU color profile and one set of in-game brightness/gamma/colorblind-mode settings. Change any of those — a different monitor, HDR vs. SDR, a colorblind accessibility mode, even GPU-level color vibrance — and the actual on-screen pixel values shift enough that detection silently degrades or stops matching, since nothing checks whether the reference colors still hold. A more robust version would sample a few fixed, known-color UI elements at startup, compare them against the calibrated reference values, and derive a per-channel color offset to compensate — recalibrating to the current display settings instead of assuming they never change.
 
-Addressing this would mean: collecting continuous (not six-point) ground truth across a wider distance range with per-bucket error tracking, detecting or locking camera zoom before trusting an estimate, reconciling the fitting and runtime formulas so the coefficients are optimized for the code path that actually ships, and either integrating the residual-correction model or removing the unused analysis path.
+Addressing this would mean: collecting continuous (not six-point) ground truth across a wider distance range with per-bucket error tracking, detecting or locking camera zoom before trusting an estimate, reconciling the fitting and runtime formulas so the coefficients are optimized for the code path that actually ships, finishing (or removing) the half-built hybrid-model path, and adding a startup color-calibration step so detection isn't locked to one display configuration.
