@@ -40,7 +40,7 @@ def main():
     for px, py, ex, ey, gd in samples:
         if gd in by_true:
             by_true[gd].append(pixel_dist(px, py, ex, ey))
-    ax1.boxplot([by_true[gd] for gd in TRUE_DISTANCES], labels=[str(d) for d in TRUE_DISTANCES])
+    ax1.boxplot([by_true[gd] for gd in TRUE_DISTANCES], tick_labels=[str(d) for d in TRUE_DISTANCES])
     ax1.set_xlabel("Known true distance (game units)")
     ax1.set_ylabel("Measured pixel distance (px)")
     ax1.set_title("Same true distance, different pixel gaps")

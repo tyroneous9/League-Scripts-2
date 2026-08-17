@@ -100,7 +100,17 @@ DATA_DRAGON_DEFAULT_LOCALE = "en_US"
 THRESHHOLD = 70
 
 # Get screen dimensions (cross-platform: Windows and Linux)
-SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
+try:
+    SCREEN_WIDTH, SCREEN_HEIGHT = pyautogui.size()
+except Exception as e:
+    raise RuntimeError(
+        "Could not detect screen size. This requires a working, authorized "
+        "graphical session (pyautogui connects to it just to query screen "
+        "dimensions). On Linux, check that $DISPLAY and $XAUTHORITY are set "
+        "correctly for the shell you're running from (echo $DISPLAY $XAUTHORITY), "
+        "or grant access with `xhost +si:localuser:$(whoami)` from an already-"
+        "authorized terminal."
+    ) from e
 SCREEN_CENTER = (SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)
 
 
