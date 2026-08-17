@@ -61,16 +61,17 @@ Each data source runs on its own thread/event loop and hands off state through l
 
 [`tools/run_visualizer.py`](tools/run_visualizer.py) is a standalone, read-only debug overlay that runs each detector against the live screen capture and draws a marker at every hit, with per-detector toggles — used to validate detection accuracy during development without affecting gameplay:
 
+<p align="center"><em>Original frame</em></p>
+<p align="center">
+  <img src="assets/health_references.png" alt="Health bar color references used for detection" width="45%">
+</p>
+
+<p align="center"><em>Output frame from detection visualizer</em></p>
 <p align="center">
   <img src="assets/visualizer_demo.png" alt="Detection visualizer output on a practice-tool test frame: correctly marks the ally (blue), enemy (red), and player (green health bar) targets" width="70%">
 </p>
 
-<p align="center"><em>Output from detection visualizer</em></p>
 
-<p align="center">
-  <img src="assets/health_references.png" alt="Health bar color references used for detection" width="45%">
-  <img src="assets/augment_reference.png" alt="Augment button color references used for detection" width="45%">
-</p>
 
 ### Screen-space → game-space distance model
 The game never exposes world coordinates directly, and the projection from 3D world space to the 2D screen is nonlinear (perspective, camera tilt, variable UI framing). [`tools/game_distance_collector.py`](tools/game_distance_collector.py) captured paired samples of on-screen pixel separation vs. known in-game unit distance; [`tools/analyze_game_distances.py`](tools/analyze_game_distances.py) fits a parametric model (nonlinear least squares via SciPy) over vertical screen position and separation angle, then layers a ridge regression on the residuals for a hybrid estimator — validated with k-fold cross-validation, feature permutation importance, and ablation tests before the final coefficients were baked into [`core/constants.py`](core/constants.py). The resulting `get_game_distance()` / `tether_offset()` functions in [`utils/game_utils.py`](utils/game_utils.py) let the bot reason about attack range and kiting distance from screen pixels alone.
