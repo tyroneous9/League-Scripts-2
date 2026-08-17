@@ -3,7 +3,6 @@
 # ==========================================================
 
 import win32api
-import os
 import sys
 from pathlib import Path
 

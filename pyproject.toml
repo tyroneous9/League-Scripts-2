@@ -1,0 +1,25 @@
+[project]
+name = "intai"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "Wesley", email = "wesleywu9@gmail.com" }
+]
+requires-python = ">=3.14"
+dependencies = [
+    "opencv-python-headless>=4.10",
+    "numpy>=2.0",
+    "scipy>=1.14",
+    "matplotlib>=3.9",
+    "requests>=2.32",
+    "urllib3>=2.2",
+    "psutil>=6.0",
+    "keyboard>=0.13.5",
+    "lcu-driver<=3.0.2",
+    "dxcam>=0.0.5; sys_platform == 'win32'",
+    "pywin32>=306; sys_platform == 'win32'",
+]
+
+[tool.uv]
+package = false
