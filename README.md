@@ -1,8 +1,10 @@
 # INTAI
 
-A Windows application that drives League of Legends' client and in-game APIs end-to-end (lobby creation, champion select, and live gameplay) using a real-time computer-vision pipeline built without any ML models or template matching.
+An application that drives League of Legends' client and in-game APIs end-to-end (lobby creation, champion select, and live gameplay) using a real-time computer-vision pipeline built without any ML models or template matching.
 
 > **Note:** This is a personal research project exploring real-time CV, async event-driven systems, and reverse-engineered client APIs. Running this program in a live game environment to automate gameplay violates the League of Legends Terms of Service.
+
+**Platform support:** the codebase runs on both Windows and Linux — screen capture (`mss`), mouse/keyboard input (`pyautogui`, `keyboard`), and window management (`pywinctl`) are all cross-platform, and PyInstaller packages a native executable on either via [`build.bat`](build.bat) (Windows) or [`build.sh`](build.sh) (Linux). That said, actually automating a *live* match realistically still requires Windows: League doesn't officially support Linux, and Vanguard (required for most queues since 2024) needs kernel-level Windows access that Wine/Proton can't provide.
 
 ## What it does
 
@@ -79,7 +81,7 @@ units = pixel_distance × unit_scale × pos_multiplier × sep_multiplier
 - **`pos_multiplier`** assumes a fixed pixel gap represents more world distance near the top of the screen (farther away, more foreshortened) than near the bottom (closer to the camera). It interpolates between a `v_top` and `v_bottom` coefficient based on the player's screen-Y position.
 - **`sep_multiplier`** assumes that same tilt foreshortens vertical screen separation more than horizontal separation, so the estimate grows multiplicatively the more vertical the gap between two points is.
 
-The fitted coefficients are saved into [`core/constants.py`](core/constants.py) and consumed by `get_game_distance()` / `tether_offset()` in [`utils/game_utils.py`](utils/game_utils.py), letting the bot reason game distance from screen pixels alone. The fit below (RMSE 51 / R² 0.95 against its own calibration data) suggests the hypothesis captures something real about the projection, though it is incomplete as covered in [Future Improvements](#future-improvements).
+The fitted coefficients are saved into [`core/constants.py`](core/constants.py) and consumed by `get_game_distance()` / `tether_offset()` in [`utils/game_utils.py`](utils/game_utils.py), letting the bot reason game distance from screen pixels alone. The fit below (RMSE 55 / R² 0.94 against its own calibration data) suggests the hypothesis captures something real about the projection, though it is incomplete as covered in [Future Improvements](#future-improvements).
 
 <p align="center">
   <img src="assets/distance_model_analysis.png">
@@ -88,7 +90,7 @@ The fitted coefficients are saved into [`core/constants.py`](core/constants.py) 
 <p align="center"><em>Left: the same true distance produces a wide range of pixel separations depending on where on screen it's measured, the reason a position/angle correction is needed at all. Right: the shipped model's predictions against its own calibration data (n=3,658): solid in the middle of the calibrated range, biased at edges (see <a href="#future-improvements">Future Improvements</a>).</em></p>
 
 ### Event handling
-[`core/LCU_Manager.py`](core/LCU_Manager.py) utilizes `lcu_driver` as a transport layer to manage the connection to the LCU API. INTAI only needs to register handlers for WebSocket events such as changes in the client and game start/end. A gate (`asyncio.Event`) suspends every handler while closed, and events queue up and fire in order once the gate reopens. This ensures no race conditions between handlers.
+[`core/lcu_manager.py`](core/lcu_manager.py) utilizes `lcu_driver` as a transport layer to manage the connection to the LCU API. INTAI only needs to register handlers for WebSocket events such as changes in the client and game start/end. A gate (`asyncio.Event`) suspends every handler while closed, and events queue up and fire in order once the gate reopens. This ensures no race conditions between handlers.
 
 ### Threaded polling with shared state
 [`core/live_client_manager.py`](core/live_client_manager.py) runs an isolated polling thread against the Live Client Data endpoint, writing into a `dict` guarded by a `threading.Lock`. Consumers never block the poller and always read/write a consistent snapshot from the dict.
@@ -103,14 +105,15 @@ The fitted coefficients are saved into [`core/constants.py`](core/constants.py) 
 
 | Area | Tools |
 |---|---|
-| Language | Python 3.11 |
+| Language | Python 3.14 |
+| Dependency management | `uv` |
 | Computer vision | OpenCV, NumPy |
 | Screen capture | `mss` (Windows and Linux) |
 | Client integration | `lcu_driver` (asyncio), `requests` |
 | Concurrency | `asyncio`, `threading` (locks, events) |
 | Modeling | SciPy (`least_squares`), bounded nonlinear regression |
 | Desktop UI | Tkinter |
-| Packaging | PyInstaller |
+| Packaging | PyInstaller (`build.bat` on Windows, `build.sh` on Linux) |
 | Input & window control | `pyautogui`, `pywinctl`, `keyboard` |
 
 ## Repository layout
@@ -123,6 +126,20 @@ config/     Runtime config (keybinds, selected mode, resolution)
 data/       Collected screen/game-distance samples used to fit the projection model
 docs/       Notes for extending the module system
 ```
+
+## Building
+
+Dependencies are managed with `uv`; `uv sync` installs everything from `pyproject.toml`/`uv.lock`. To package a standalone executable:
+
+```
+# Windows
+build.bat
+
+# Linux
+./build.sh
+```
+
+Both invoke PyInstaller with the same entry point (`main.py`) and bundled data (`config/`, `templates/`); the two scripts differ only where PyInstaller's own flags are platform-specific (`--add-data` uses `;` on Windows vs `:` on Linux, and `--uac-admin`/`--icon` are Windows-only).
 
 ## Future Improvements
 

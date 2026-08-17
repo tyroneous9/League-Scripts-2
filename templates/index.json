@@ -1,29 +1,29 @@
 {
   "1920x1080": {
     "sell_btn": {
-      "path": "1920x1080\\sell_btn_1920x1080.png",
+      "path": "1920x1080/sell_btn_1920x1080.png",
       "blur": 3
     },
     "arena_exit_btn": {
-      "path": "1920x1080\\arena_exit_btn_1920x1080.png",
+      "path": "1920x1080/arena_exit_btn_1920x1080.png",
       "blur": 3
     },
     "toggle_augments_btn": {
-      "path": "1920x1080\\toggle_augments_btn_1920x1080.png",
+      "path": "1920x1080/toggle_augments_btn_1920x1080.png",
       "blur": 3
     }
   },
   "1920x1200": {
     "arena_exit_btn": {
-      "path": "1920x1200\\arena_exit_btn_1920x1200.png",
+      "path": "1920x1200/arena_exit_btn_1920x1200.png",
       "blur": 3
     },
     "sell_btn": {
-      "path": "1920x1200\\sell_btn_1920x1200.png",
+      "path": "1920x1200/sell_btn_1920x1200.png",
       "blur": 3
     },
     "toggle_augments_btn": {
-      "path": "1920x1200\\toggle_augments_btn_1920x1200.png",
+      "path": "1920x1200/toggle_augments_btn_1920x1200.png",
       "blur": 3
     }
   }

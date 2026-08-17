@@ -75,7 +75,9 @@ def prepare_template(src_path: str, templates_dir: str = "templates", resolution
     # Update single index.json file with metadata so runtime matchers know
     # how the template was preprocessed (blur kernel, grayscale, resolution)
     entry_info = {
-        "path": os.path.join(f"{width}x{height}", filename),
+        # stored with '/' regardless of host OS: this path is serialized into
+        # index.json and read back on whatever OS runs the bot
+        "path": "/".join([f"{width}x{height}", filename]),
         "blur": int(blur_amount)
     }
     _update_templates_index(template_id_base, entry_info, templates_dir)
@@ -101,7 +103,7 @@ def _update_templates_index(template_id: str, entry_info: Dict[str, Any], templa
     rel_path = entry_info.get("path", "")
     if not rel_path:
         raise ValueError("entry_info.path is required")
-    key = rel_path.split(os.path.sep)[0]
+    key = rel_path.split("/")[0]
     if key not in index or not isinstance(index[key], dict):
         index[key] = {}
 
@@ -376,7 +378,7 @@ class TemplatePrepGUI:
 
         index = self._load_index(templates_dir)
         # find key (resolution folder)
-        key = rel_path.split(os.path.sep)[0]
+        key = rel_path.split("/")[0]
         if key in index and isinstance(index[key], dict):
             tid = entry.get("id")
             if tid in index[key]:
