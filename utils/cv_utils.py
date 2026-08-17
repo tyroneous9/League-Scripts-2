@@ -1,3 +1,4 @@
+import logging
 import numpy as np
 import cv2
 import os
@@ -137,8 +138,13 @@ def load_template_cache() -> None:
         full_idx = json.load(fh)
 
     resolution_key = f"{SCREEN_WIDTH}x{SCREEN_HEIGHT}"
-    entries = full_idx[resolution_key]
-
+    if resolution_key in full_idx:
+        logging.info("Your resolution is supported: %s", resolution_key)
+        entries = full_idx[resolution_key]
+    else:
+        available = ", ".join(sorted(full_idx.keys()))
+        logging.warning("Your resolution is NOT supported: %s. Available: %s", resolution_key, available)
+        raise ValueError(f"Resolution is NOT supported: {resolution_key}; available: {available}")
     _INDEX_CACHE = {resolution_key: entries}
     _TEMPLATE_IMAGE_CACHE.clear()
 

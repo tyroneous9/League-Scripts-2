@@ -1,7 +1,10 @@
 {
     "General": {
-        "selected_game_mode": "aram",
-        "preferred_champion": {},
+        "selected_game_mode": "arena",
+        "preferred_champion": {
+            "id": 102,
+            "name": "Shyvana"
+        },
         "surrender": false,
         "game_resolution": {
             "width": 1920,
@@ -114,10 +117,10 @@
         ],
         "evtChampionOnly": [
             {
-                "type": "key",
-                "key": "v",
+                "type": "mouse",
+                "mouse": "middle",
                 "modifiers": [],
-                "raw": "[v]"
+                "raw": "[Button 3]"
             }
         ],
         "evtChatHistory": [
@@ -129,22 +132,15 @@
             }
         ],
         "evtDragScrollLock": [],
-        "evtDrawHud": [
-            {
-                "type": "key",
-                "key": "h",
-                "modifiers": [],
-                "raw": "[h]"
-            }
-        ],
+        "evtDrawHud": [],
         "evtEmoteDance": [
             {
                 "type": "key",
                 "key": "3",
                 "modifiers": [
-                    "ctrl"
+                    "alt"
                 ],
-                "raw": "[Ctrl][3]"
+                "raw": "[Alt][3]"
             }
         ],
         "evtEmoteJoke": [
@@ -152,9 +148,9 @@
                 "type": "key",
                 "key": "1",
                 "modifiers": [
-                    "ctrl"
+                    "alt"
                 ],
-                "raw": "[Ctrl][1]"
+                "raw": "[Alt][1]"
             }
         ],
         "evtEmoteLaugh": [
@@ -162,9 +158,9 @@
                 "type": "key",
                 "key": "4",
                 "modifiers": [
-                    "ctrl"
+                    "alt"
                 ],
-                "raw": "[Ctrl][4]"
+                "raw": "[Alt][4]"
             }
         ],
         "evtEmoteTaunt": [
@@ -172,9 +168,9 @@
                 "type": "key",
                 "key": "2",
                 "modifiers": [
-                    "ctrl"
+                    "alt"
                 ],
-                "raw": "[Ctrl][2]"
+                "raw": "[Alt][2]"
             }
         ],
         "evtEmoteToggle": [
@@ -240,14 +236,7 @@
         "evtNormalCastSpell3": [],
         "evtNormalCastSpell4": [],
         "evtNormalCastVisionItem": [],
-        "evtOnUIMouse4Pan": [
-            {
-                "type": "mouse",
-                "mouse": "middle",
-                "modifiers": [],
-                "raw": "[Button 3]"
-            }
-        ],
+        "evtOnUIMouse4Pan": [],
         "evtOpenShop": [
             {
                 "type": "key",
@@ -281,12 +270,6 @@
             }
         ],
         "evtPlayerAttackMove": [
-            {
-                "type": "key",
-                "key": "u",
-                "modifiers": [],
-                "raw": "[u]"
-            },
             {
                 "type": "key",
                 "key": "x",
@@ -361,7 +344,14 @@
                 "raw": "[i]"
             }
         ],
-        "evtReciprocityTrigger": [],
+        "evtReciprocityTrigger": [
+            {
+                "type": "key",
+                "key": "u",
+                "modifiers": [],
+                "raw": "[u]"
+            }
+        ],
         "evtScrollDown": [
             {
                 "type": "key",
@@ -447,36 +437,9 @@
                 "raw": "[Alt][f]"
             }
         ],
-        "evtSelfCastItem1": [
-            {
-                "type": "key",
-                "key": "1",
-                "modifiers": [
-                    "alt"
-                ],
-                "raw": "[Alt][1]"
-            }
-        ],
-        "evtSelfCastItem2": [
-            {
-                "type": "key",
-                "key": "2",
-                "modifiers": [
-                    "alt"
-                ],
-                "raw": "[Alt][2]"
-            }
-        ],
-        "evtSelfCastItem3": [
-            {
-                "type": "key",
-                "key": "3",
-                "modifiers": [
-                    "alt"
-                ],
-                "raw": "[Alt][3]"
-            }
-        ],
+        "evtSelfCastItem1": [],
+        "evtSelfCastItem2": [],
+        "evtSelfCastItem3": [],
         "evtSelfCastItem4": [
             {
                 "type": "key",
@@ -547,16 +510,7 @@
                 "raw": "[Alt][r]"
             }
         ],
-        "evtSelfCastVisionItem": [
-            {
-                "type": "key",
-                "key": "4",
-                "modifiers": [
-                    "alt"
-                ],
-                "raw": "[Alt][4]"
-            }
-        ],
+        "evtSelfCastVisionItem": [],
         "evtShowCharacterMenu": [
             {
                 "type": "key",

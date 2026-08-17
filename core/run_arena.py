@@ -94,6 +94,10 @@ def run_game_loop(stop_event):
         # Shop phase triggered on level up or by gold increase of >=500g
         if gold > prev_gold + 500 or current_level > prev_level:
             time.sleep(5)
+            prev_gold = gold
+            if current_level > prev_level:
+                level_up_abilities()
+                prev_level = current_level
             end_time = 20 + time.monotonic()
             while not game_ended and not stop_event.is_set():
                 augment = find_augment_location_template(screen_manager.get_latest_frame())
@@ -104,9 +108,6 @@ def run_game_loop(stop_event):
                 elif time.monotonic() > end_time:
                     break
                 time.sleep(1)
-            if current_level > prev_level:
-                level_up_abilities()
-                prev_level = current_level
             time.sleep(2)
             augment = find_augment_location_template(screen_manager.get_latest_frame())
             if augment:

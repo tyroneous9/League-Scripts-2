@@ -20,14 +20,11 @@ ROOT = os.path.dirname(os.path.dirname(__file__))
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from utils.cv_utils import get_grayscale, get_blurred
+from utils.cv_utils import get_grayscale
 
 PRESET_RESOLUTIONS = [
     (1920, 1080),
-    (1600, 900),
-    (1366, 768),
-    (1280, 720),
-    (1024, 576),
+    (1920, 1200),
 ]
 
 

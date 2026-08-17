@@ -2,6 +2,7 @@
 import logging
 import threading
 import winsound
+from utils.cv_utils import load_template_cache
 from utils.general_utils import enable_logging, listen_for_exit
 from core.menu import show_menu  
 from core.lcu_manager import LCUManager
@@ -45,6 +46,8 @@ if __name__ == "__main__":
     Handles menu navigation and starts the connector.
     """
     enable_logging()
+    load_template_cache()
+    
     listen_for_exit(shutdown)
     show_menu(run_script)
 

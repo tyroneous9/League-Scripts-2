@@ -503,7 +503,7 @@ def tether_offset(player_coords, target_coords, tether_distance):
     # base duration (seconds) plus small safety margin
     duration = travel_units / player_speed
     # clamp reasonable bounds so we don't sleep too little or too long
-    duration = max(0.05, min(duration, 4.0))
+    duration = max(0.05, min(duration, 0.5))
     time.sleep(duration)
     return
 

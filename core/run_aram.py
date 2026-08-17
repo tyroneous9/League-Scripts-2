@@ -125,7 +125,6 @@ def run_game_loop(stop_event):
             last_afk_check_time = time.time()
             # move around ally
             move_random_offset(ally_locations[0], 5)
-            time.sleep(0.2)
             # fight enemy
             send_keybind("evtCameraSnap", _keybinds, press_time=0.2)
             enemy_locations = find_enemy_locations(screen_manager.get_latest_frame())
