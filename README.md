@@ -4,8 +4,6 @@ An application that drives League of Legends' client and in-game APIs end-to-end
 
 > **Note:** This is a personal research project exploring real-time CV, async event-driven systems, and reverse-engineered client APIs. Running this program in a live game environment to automate gameplay violates the League of Legends Terms of Service.
 
-**Platform support:** the codebase runs on both Windows and Linux — screen capture (`mss`), mouse/keyboard input (`pyautogui`, `keyboard`), and window management (`pywinctl`) are all cross-platform, and PyInstaller packages a native executable on either via [`build.bat`](build.bat) (Windows) or [`build.sh`](build.sh) (Linux). That said, actually automating a *live* match realistically still requires Windows: League doesn't officially support Linux, and Vanguard (required for most queues since 2024) needs kernel-level Windows access that Wine/Proton can't provide.
-
 ## What it does
 
 INTAI connects to two local League of Legends services and coordinates them through a shared, threaded runtime:
@@ -36,11 +34,11 @@ flowchart LR
     end
 
     LCU <-->|gameflow / champ-select events| LCUManager
-    LiveData -->|polled every 100ms| LiveClientManager
-    Screen -->|60fps frames| ScreenManager
+    LiveData -->|polled| LiveClientManager
+    Screen -->|frames| ScreenManager
     ScreenManager --> CV
     LCUManager -->|spawns on game start| BotManager
-    BotManager -->|importlib, config-selected| Loop
+    BotManager -->|dispatch| Loop
     LiveClientManager -->|shared, lock-guarded state| Loop
     CV -->|champion coordinates| Loop
 ```
@@ -68,7 +66,7 @@ Each data source runs on its own thread/event loop and hands off state through l
 
 ### Screen-space → game-space distance model
 
-**Why this needs a model at all:** the game never exposes world coordinates directly, and pixel distance does not scale linearly with game distance: two champions standing the same true distance apart produce a *different* pixel gap depending on where on screen that happens, because the 3D-to-2D projection is nonlinear (perspective, camera tilt, etc). Raw pixel measurements are useless for game distance calculations until something corrects for that.
+Why this needs a model at all: the game never exposes world coordinates directly, and pixel distance does not scale linearly with game distance: two champions standing the same true distance apart produce a *different* pixel gap depending on where on screen that happens, because the 3D-to-2D projection is nonlinear (perspective, camera tilt, etc). Raw pixel measurements are useless for game distance calculations until something corrects for that.
 
 [`tools/game_distance_collector.py`](tools/game_distance_collector.py) was used to collect data about on-screen pixel positions while a target sat at one of six known true distances, found from champion attack ranges (125, 250, 550, 594, 647, 700 units). These ranges were tested across many player screen positions and camera angles. [`tools/analyze_game_distances.py`](tools/analyze_game_distances.py) then fit a parametric model against the data (using nonlinear least squares via SciPy):
 
@@ -76,7 +74,7 @@ Each data source runs on its own thread/event loop and hands off state through l
 units = pixel_distance × unit_scale × pos_multiplier × sep_multiplier
 ```
 
-**A hypothesis about League's camera, not a documented fact:** Riot doesn't publish the camera's projection math, so this model is merely a reverse-engineered guess about *why* the projection distorts the way it does.
+A hypothesis about League's camera, not a documented fact: Riot doesn't publish the camera's projection math, so this model is merely a reverse-engineered guess about *why* the projection distorts the way it does.
 
 - **`pos_multiplier`** assumes a fixed pixel gap represents more world distance near the top of the screen (farther away, more foreshortened) than near the bottom (closer to the camera). It interpolates between a `v_top` and `v_bottom` coefficient based on the player's screen-Y position.
 - **`sep_multiplier`** assumes that same tilt foreshortens vertical screen separation more than horizontal separation, so the estimate grows multiplicatively the more vertical the gap between two points is.
@@ -101,20 +99,12 @@ The fitted coefficients are saved into [`core/constants.py`](core/constants.py) 
 ### Pluggable config-based scripts
 [`core/bot_manager.py`](core/bot_manager.py) dynamically imports the module registered for the active game mode (`core/constants.py`'s `SUPPORTED_MODES`) via `importlib` and runs its `run_game_loop` entry point on its own thread; adding a new mode is a new `core/run_<mode>.py` file plus one constants entry, making development of new modes modular.
 
-## Tech stack
+## Future Improvements
 
-| Area | Tools |
-|---|---|
-| Language | Python 3.14 |
-| Dependency management | `uv` |
-| Computer vision | OpenCV, NumPy |
-| Screen capture | `mss` (Windows and Linux) |
-| Client integration | `lcu_driver` (asyncio), `requests` |
-| Concurrency | `asyncio`, `threading` (locks, events) |
-| Modeling | SciPy (`least_squares`), bounded nonlinear regression |
-| Desktop UI | Tkinter |
-| Packaging | PyInstaller (`build.bat` on Windows, `build.sh` on Linux) |
-| Input & window control | `pyautogui`, `pywinctl`, `keyboard` |
+Known issues in the current implementation, and possible fixes:
+
+1. **Distance model has significant error bias toward the shortest and longest distances.** Coverage of screen position is good, but the error is not uniform across that range: at the shortest calibrated distance (125 units) the model over-predicts by 71 units on average (a 57% relative error), and at the longest (700 units) it under-predicts by ~37 units (~6%). The hypothesized parameters for this model could be insufficient or outright wrong. Some other possibilities I could have tried are: horizontal distortion, angular distortion, logarthimic distance scaling, terrain elevation, screen aspect ratio. Intentionally, camera zoom was not considered because in practical use of this tool, there is no reason to use any other zoom other than the default zoom level (max).
+2. **Color-adjacency detection is calibrated to one exact display configuration.** The BGR reference values in `core/constants.py` (`HEALTH_LEFT_COLOR`, `PLAYER_HEALTH_RIGHT_COLOR`, etc.) and the tolerances (typically ±1 to 5 per channel, see the `find_*_location` calls in `cv_utils.py`) were sampled only using one machine: under one monitor/GPU color profile and one set of in-game brightness/gamma/colorblind-mode settings. Change any of those (a different monitor, HDR vs. SDR, a colorblind accessibility mode, even GPU-level color vibrance) and the actual on-screen pixel values shift enough that detection can no longer catch the offset and thus fail. A possible fix could be sampling the colors of known elements to determine a machine-wide or game-wide offset. Alternatively, tolerance can be increased, but it is intentionally kept low enough as to detect less false-positives.
 
 ## Repository layout
 
@@ -126,6 +116,10 @@ config/     Runtime config (keybinds, selected mode, resolution)
 data/       Collected screen/game-distance samples used to fit the projection model
 docs/       Notes for extending the module system
 ```
+
+## Platform support
+
+The codebase runs on both Windows and Linux — screen capture (`mss`), mouse/keyboard input (`pyautogui`, `keyboard`), and window management (`pywinctl`) are all cross-platform, and PyInstaller packages a native executable on either via [`build.bat`](build.bat) (Windows) or [`build.sh`](build.sh) (Linux). Won't help you automate a live match though — League doesn't run on Linux, and Vanguard blocks Wine/Proton anyway.
 
 ## Building
 
@@ -140,10 +134,3 @@ build.bat
 ```
 
 Both invoke PyInstaller with the same entry point (`main.py`) and bundled data (`config/`, `templates/`); the two scripts differ only where PyInstaller's own flags are platform-specific (`--add-data` uses `;` on Windows vs `:` on Linux, and `--uac-admin`/`--icon` are Windows-only).
-
-## Future Improvements
-
-Known issues in the current implementation, and possible fixes:
-
-1. **Distance model has significant error bias toward the shortest and longest distances.** Coverage of screen position is good, but the error is not uniform across that range: at the shortest calibrated distance (125 units) the model **over-predicts by 71 units on average (a 57% relative error)**, and at the longest (700 units) it **under-predicts by ~37 units (~6%)**. The hypothesized parameters for this model could be insufficient or outright wrong. Some other possibilities I could have tried are: horizontal distortion, angular distortion, logarthimic distance scaling, terrain elevation, screen aspect ratio. Intentionally, camera zoom was not considered because in practical use of this tool, there is no reason to use any other zoom other than the default zoom level (max).
-2. **Color-adjacency detection is calibrated to one exact display configuration.** The BGR reference values in `core/constants.py` (`HEALTH_LEFT_COLOR`, `PLAYER_HEALTH_RIGHT_COLOR`, etc.) and the tolerances (typically ±1 to 5 per channel, see the `find_*_location` calls in `cv_utils.py`) were sampled only using one machine: under one monitor/GPU color profile and one set of in-game brightness/gamma/colorblind-mode settings. Change any of those (a different monitor, HDR vs. SDR, a colorblind accessibility mode, even GPU-level color vibrance) and the actual on-screen pixel values shift enough that detection can no longer catch the offset and thus fail. A possible fix could be sampling the colors of known elements to determine a machine-wide or game-wide offset. Alternatively, tolerance can be increased, but it is intentionally kept low enough as to detect less false-positives.
